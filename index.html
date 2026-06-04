@@ -39,6 +39,11 @@ resize();window.addEventListener('resize',resize);
 const keys={};
 document.addEventListener('keydown',e=>{
   initAudio();resumeAC();
+  if(gState==='SELECT'){
+    if(e.key==='ArrowLeft'||e.key==='a'||e.key==='A')selectedShip=(selectedShip+2)%3;
+    if(e.key==='ArrowRight'||e.key==='d'||e.key==='D')selectedShip=(selectedShip+1)%3;
+    if(e.key==='Enter'||e.key===' ')confirmShip();
+  }
   if((e.key==='x'||e.key==='X')&&(gState==='PLAYING'||gState==='BOSS')){triggerUltimate();}
   if((e.key==='c'||e.key==='C')&&gState==='GAMEOVER'){lbClear();}
   keys[e.key]=true;e.preventDefault();
@@ -54,6 +59,17 @@ canvas.addEventListener('touchstart',e=>{
   for(const t of e.changedTouches){
     const{x,y}=pageToCanvas(t.clientX,t.clientY);
     if(gState==='MENU'||gState==='GAMEOVER'){startGame();return;}
+    if(gState==='SELECT'){
+      // Tap on ship card zones
+      if(y>H*0.15&&y<H*0.82){
+        const zone=Math.floor(x/(W/3));
+        if(zone===selectedShip){confirmShip();}  // second tap = confirm
+        else{selectedShip=zone%3;}               // first tap = select
+      }
+      // Confirm button area
+      if(y>H*0.85){confirmShip();}
+      return;
+    }
     // SP button (bottom-right) takes priority
     if(Math.hypot(x-SP_BTN.x,y-SP_BTN.y)<SP_BTN.r+14){
       SP.btnPulse=8;triggerUltimate();return;
@@ -350,6 +366,19 @@ const STAGES=[
 ];
 const KILL_GOAL=28;
 
+// ── SHIP CONFIGS ─────────────────────────────────
+const SHIPS=[
+  {name:'颱風',sub:'TYPHOON', desc:'均衡全能型',
+   hint:'標準三聯砲  ·  適合初心者',
+   col:'#00e5ff',blades:3,spd:5,sRate:14,weapon:'normal',wlv:1,stat:[3,3,3]},
+  {name:'暴風',sub:'GALE',    desc:'重裝火力型',
+   hint:'初始散彈Lv1  ·  覆蓋廣但稍慢',
+   col:'#ffaa00',blades:4,spd:4.5,sRate:18,weapon:'shotgun',wlv:1,stat:[2,5,4]},
+  {name:'閃電',sub:'LIGHTNING',desc:'速攻雷射型',
+   hint:'初始雷射Lv1  ·  速度最快',
+   col:'#cc44ff',blades:2,spd:6.0,sRate:14,weapon:'laser',wlv:1,stat:[5,4,5]},
+];
+
 // ── WEAPON SYSTEM ─────────────────────────────────
 const WEAPON={type:'normal',level:1,laserTick:0};
 const SHOTGUN_CFG=[[3,18],[5,22],[7,28],[9,33],[11,38]];
@@ -502,54 +531,137 @@ function drawSpeedTrail(){
   }
   ctx.shadowBlur=0;ctx.restore();
 }
-function drawPlayer(){
-  if(P.inv>0&&Math.floor(P.inv/5)%2===1&&BUFF.shield<=0)return;
-  const{x,y,blade}=P,c=weaponColor(),t=Date.now()/1000;
+// ── SHIP DRAWING FUNCTIONS ────────────────────────
+function drawShipAt(idx,x,y,blade,sc,overCol){
+  const c=overCol||(WEAPON.type==='normal'?SHIPS[idx].col:weaponColor());
   ctx.save();ctx.translate(x,y);
-  // Exhaust jets
-  for(let j=-1;j<=1;j+=2){
-    const jg=ctx.createRadialGradient(j*9,18,0,j*9,18,11+Math.sin(t*14)*3);
-    jg.addColorStop(0,c+'dd');jg.addColorStop(0.5,c+'55');jg.addColorStop(1,'transparent');
-    ctx.fillStyle=jg;ctx.beginPath();ctx.arc(j*9,18,11+Math.sin(t*14)*3,0,Math.PI*2);ctx.fill();
-  }
-  // Wings
-  ctx.shadowColor=c;ctx.shadowBlur=10;
-  for(let j=-1;j<=1;j+=2){
-    ctx.beginPath();ctx.moveTo(j*7,-4);ctx.lineTo(j*28,8);ctx.lineTo(j*24,20);ctx.lineTo(j*7,12);ctx.closePath();
-    const wg=ctx.createLinearGradient(0,4,j*28,8);wg.addColorStop(0,c+'cc');wg.addColorStop(1,c+'18');
-    ctx.fillStyle=wg;ctx.fill();ctx.strokeStyle=c+'88';ctx.lineWidth=1;ctx.stroke();
-    ctx.beginPath();ctx.moveTo(j*13,5);ctx.lineTo(j*22,13);ctx.strokeStyle=c+'55';ctx.lineWidth=0.7;ctx.stroke();
-  }
-  // Fuselage
-  ctx.shadowBlur=16;
-  const fg=ctx.createLinearGradient(0,-22,0,22);
+  if(sc&&sc!==1)ctx.scale(sc,sc);
+  if(idx===0)drawShip0(blade,c);
+  else if(idx===1)drawShip1(blade,c);
+  else drawShip2(blade,c);
+  ctx.restore();
+}
+
+function shipExhaust(x,gain,c){
+  const jg=ctx.createRadialGradient(x,18,0,x,18,11+gain*3);
+  jg.addColorStop(0,c+'dd');jg.addColorStop(0.5,c+'55');jg.addColorStop(1,'transparent');
+  ctx.fillStyle=jg;ctx.beginPath();ctx.arc(x,18,11+gain*3,0,Math.PI*2);ctx.fill();
+}
+function shipWing(j,c){
+  ctx.beginPath();ctx.moveTo(j*7,-4);ctx.lineTo(j*28,8);ctx.lineTo(j*24,20);ctx.lineTo(j*7,12);ctx.closePath();
+  const wg=ctx.createLinearGradient(0,4,j*28,8);wg.addColorStop(0,c+'cc');wg.addColorStop(1,c+'18');
+  ctx.fillStyle=wg;ctx.fill();ctx.strokeStyle=c+'88';ctx.lineWidth=1;ctx.stroke();
+  ctx.beginPath();ctx.moveTo(j*13,5);ctx.lineTo(j*22,13);ctx.strokeStyle=c+'55';ctx.lineWidth=0.7;ctx.stroke();
+}
+function shipFuselage(c,pts){
+  const fg=ctx.createLinearGradient(0,pts[1],0,pts[pts.length-1]);
   fg.addColorStop(0,c+'55');fg.addColorStop(0.5,'#1a1a2e');fg.addColorStop(1,c+'22');
-  ctx.fillStyle=fg;ctx.beginPath();
-  ctx.moveTo(0,-22);ctx.lineTo(10,-8);ctx.lineTo(11,6);ctx.lineTo(9,22);
-  ctx.lineTo(-9,22);ctx.lineTo(-11,6);ctx.lineTo(-10,-8);ctx.closePath();
-  ctx.fill();ctx.strokeStyle=c;ctx.lineWidth=1.5;ctx.stroke();
+  ctx.fillStyle=fg;ctx.beginPath();ctx.moveTo(pts[0],pts[1]);
+  for(let i=2;i<pts.length;i+=2)ctx.lineTo(pts[i],pts[i+1]);
+  ctx.closePath();ctx.fill();ctx.strokeStyle=c;ctx.lineWidth=1.5;ctx.stroke();
+}
+function shipCore(c){
+  const cg=ctx.createRadialGradient(0,-2,0,0,-2,9);
+  cg.addColorStop(0,'#fff');cg.addColorStop(0.35,c);cg.addColorStop(0.7,c+'88');cg.addColorStop(1,'transparent');
+  ctx.fillStyle=cg;ctx.shadowColor=c;ctx.shadowBlur=22;ctx.beginPath();ctx.arc(0,-2,9,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.shadowBlur=8;ctx.beginPath();ctx.arc(0,-2,3,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+}
+
+function drawShip0(blade,c){ // 颱風 - 3-blade balanced
+  const g=Math.sin(Date.now()/72)*0.5+0.5;
+  for(let j=-1;j<=1;j+=2)shipExhaust(j*9,g,c);
+  ctx.shadowColor=c;ctx.shadowBlur=10;
+  for(let j=-1;j<=1;j+=2)shipWing(j,c);
+  ctx.shadowBlur=16;
+  shipFuselage(c,[0,-22, 10,-8, 11,6, 9,22, -9,22, -11,6, -10,-8]);
   ctx.strokeStyle=c+'44';ctx.lineWidth=0.7;
   ctx.beginPath();ctx.moveTo(0,-20);ctx.lineTo(0,20);ctx.stroke();
   ctx.beginPath();ctx.moveTo(-9,-2);ctx.lineTo(9,-2);ctx.stroke();
   ctx.beginPath();ctx.moveTo(-8,10);ctx.lineTo(8,10);ctx.stroke();
-  // Turbine blades
-  ctx.rotate(blade);
-  for(let i=0;i<3;i++){
-    ctx.save();ctx.rotate((Math.PI*2/3)*i);
+  ctx.rotate(blade);ctx.shadowColor=c;
+  for(let i=0;i<3;i++){ctx.save();ctx.rotate((Math.PI*2/3)*i);
     ctx.beginPath();ctx.moveTo(0,-8);ctx.bezierCurveTo(7,-18,11,-33,3,-41);ctx.bezierCurveTo(0,-37,-1,-29,0,-21);ctx.bezierCurveTo(-5,-17,-5,-13,0,-8);ctx.closePath();
-    const bg=ctx.createLinearGradient(0,-8,3,-41);bg.addColorStop(0,c);bg.addColorStop(1,'#ffffff');
-    ctx.fillStyle=bg;ctx.globalAlpha=0.92;ctx.shadowColor=c;ctx.shadowBlur=8;ctx.fill();
-    ctx.globalAlpha=0.45;ctx.strokeStyle='#fff';ctx.lineWidth=0.6;ctx.stroke();
-    ctx.globalAlpha=1;ctx.restore();
+    const bg=ctx.createLinearGradient(0,-8,3,-41);bg.addColorStop(0,c);bg.addColorStop(1,'#fff');
+    ctx.fillStyle=bg;ctx.globalAlpha=0.92;ctx.shadowBlur=8;ctx.fill();
+    ctx.globalAlpha=0.45;ctx.strokeStyle='#fff';ctx.lineWidth=0.6;ctx.stroke();ctx.globalAlpha=1;ctx.restore();}
+  ctx.rotate(-blade);ctx.shadowBlur=0;
+  shipCore(c);
+}
+
+function drawShip1(blade,c){ // 暴風 - 4-blade shotgun
+  const g=Math.sin(Date.now()/60)*0.5+0.5;
+  // Triple exhaust
+  for(let jx of[-12,0,12])shipExhaust(jx,g*0.8,c);
+  ctx.shadowColor=c;ctx.shadowBlur=12;
+  // Wider swept wings with cannon pods
+  for(let j=-1;j<=1;j+=2){
+    ctx.beginPath();ctx.moveTo(j*8,-6);ctx.lineTo(j*36,4);ctx.lineTo(j*34,18);ctx.lineTo(j*8,14);ctx.closePath();
+    const wg=ctx.createLinearGradient(0,4,j*36,4);wg.addColorStop(0,c+'cc');wg.addColorStop(1,c+'22');
+    ctx.fillStyle=wg;ctx.fill();ctx.strokeStyle=c+'88';ctx.lineWidth=1;ctx.stroke();
+    // Gun pod
+    ctx.fillStyle=c+'bb';ctx.beginPath();ctx.ellipse(j*34,10,5,9,0,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle=c;ctx.lineWidth=1;ctx.stroke();
+    // Muzzle
+    ctx.fillStyle=c;ctx.shadowBlur=8;ctx.beginPath();ctx.arc(j*34,18,3.5,0,Math.PI*2);ctx.fill();
+    ctx.shadowBlur=0;
   }
-  ctx.rotate(-blade);
-  // Core reactor
-  const cg=ctx.createRadialGradient(0,-2,0,0,-2,9);
-  cg.addColorStop(0,'#fff');cg.addColorStop(0.35,c);cg.addColorStop(0.7,c+'88');cg.addColorStop(1,'transparent');
-  ctx.fillStyle=cg;ctx.shadowColor=c;ctx.shadowBlur=22;
-  ctx.beginPath();ctx.arc(0,-2,9,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#fff';ctx.shadowBlur=8;ctx.beginPath();ctx.arc(0,-2,3,0,Math.PI*2);ctx.fill();
-  ctx.shadowBlur=0;ctx.restore();
+  // Wider body
+  ctx.shadowBlur=16;
+  shipFuselage(c,[0,-18, 13,-6, 14,6, 11,22, -11,22, -14,6, -13,-6]);
+  ctx.strokeStyle=c+'44';ctx.lineWidth=0.7;
+  ctx.beginPath();ctx.moveTo(0,-16);ctx.lineTo(0,20);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(-11,-2);ctx.lineTo(11,-2);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(-10,10);ctx.lineTo(10,10);ctx.stroke();
+  // 4-blade turbine
+  ctx.rotate(blade);ctx.shadowColor=c;
+  for(let i=0;i<4;i++){ctx.save();ctx.rotate((Math.PI/2)*i);
+    ctx.beginPath();ctx.moveTo(0,-7);ctx.bezierCurveTo(6,-15,9,-26,2,-33);ctx.bezierCurveTo(-1,-30,-2,-22,0,-15);ctx.bezierCurveTo(-4,-12,-4,-9,0,-7);ctx.closePath();
+    const bg=ctx.createLinearGradient(0,-7,2,-33);bg.addColorStop(0,c);bg.addColorStop(1,'#fff');
+    ctx.fillStyle=bg;ctx.globalAlpha=0.9;ctx.shadowBlur=8;ctx.fill();
+    ctx.globalAlpha=0.4;ctx.strokeStyle='#fff';ctx.lineWidth=0.6;ctx.stroke();ctx.globalAlpha=1;ctx.restore();}
+  ctx.rotate(-blade);ctx.shadowBlur=0;
+  shipCore(c);
+}
+
+function drawShip2(blade,c){ // 閃電 - 2-blade laser
+  const g=Math.sin(Date.now()/50)*0.5+0.5;
+  // Single wide exhaust
+  const eg=ctx.createRadialGradient(0,20,0,0,20,16+g*5);
+  eg.addColorStop(0,c+'ee');eg.addColorStop(0.5,c+'55');eg.addColorStop(1,'transparent');
+  ctx.fillStyle=eg;ctx.beginPath();ctx.arc(0,20,16+g*5,0,Math.PI*2);ctx.fill();
+  ctx.shadowColor=c;ctx.shadowBlur=10;
+  // Swept delta wings
+  for(let j=-1;j<=1;j+=2){
+    ctx.beginPath();ctx.moveTo(j*6,-8);ctx.lineTo(j*26,2);ctx.lineTo(j*20,20);ctx.lineTo(j*6,16);ctx.closePath();
+    const wg=ctx.createLinearGradient(0,0,j*26,2);wg.addColorStop(0,c+'cc');wg.addColorStop(1,c+'18');
+    ctx.fillStyle=wg;ctx.fill();ctx.strokeStyle=c+'88';ctx.lineWidth=1;ctx.stroke();
+  }
+  // Sleek elongated body
+  ctx.shadowBlur=16;
+  shipFuselage(c,[0,-28, 8,-10, 9,6, 8,24, -8,24, -9,6, -8,-10]);
+  ctx.strokeStyle=c+'44';ctx.lineWidth=0.7;
+  ctx.beginPath();ctx.moveTo(0,-26);ctx.lineTo(0,22);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(-7,4);ctx.lineTo(7,4);ctx.stroke();
+  // Energy ring (laser theme)
+  const ringPulse=0.7+Math.sin(Date.now()/200)*0.3;
+  ctx.beginPath();ctx.arc(0,-6,18+ringPulse*2,0,Math.PI*2);
+  ctx.strokeStyle=c+(Math.floor(ringPulse*99+10)).toString(16).padStart(2,'0');
+  ctx.lineWidth=1;ctx.setLineDash([4,5]);ctx.stroke();ctx.setLineDash([]);
+  // 2-blade long turbine
+  ctx.rotate(blade);ctx.shadowColor=c;
+  for(let i=0;i<2;i++){ctx.save();ctx.rotate(Math.PI*i);
+    ctx.beginPath();ctx.moveTo(0,-8);ctx.bezierCurveTo(7,-20,9,-38,1,-46);ctx.bezierCurveTo(-2,-42,-3,-32,0,-22);ctx.bezierCurveTo(-5,-18,-5,-13,0,-8);ctx.closePath();
+    const bg=ctx.createLinearGradient(0,-8,1,-46);bg.addColorStop(0,c);bg.addColorStop(0.6,'#cc88ff');bg.addColorStop(1,'#fff');
+    ctx.fillStyle=bg;ctx.globalAlpha=0.93;ctx.shadowBlur=10;ctx.fill();
+    ctx.globalAlpha=0.4;ctx.strokeStyle='#fff';ctx.lineWidth=0.7;ctx.stroke();ctx.globalAlpha=1;ctx.restore();}
+  ctx.rotate(-blade);ctx.shadowBlur=0;
+  shipCore(c);
+}
+
+function drawPlayer(){
+  if(P.inv>0&&Math.floor(P.inv/5)%2===1&&BUFF.shield<=0)return;
+  const{x,y,blade}=P;
+  drawShipAt(selectedShip,x,y,blade,1,null);
 }
 
 function drawLaser(){
@@ -946,6 +1058,7 @@ function fireBoss(){
 //  UPDATE
 // ═══════════════════════════════════════════════════
 function update(){
+  if(gState==='SELECT'){shipAngle+=0.05;updateStars();return;}
   if(gState==='GAMEOVER'){gameoverTimer++;updateStars();return;}
   if(gState==='CLEAR'){clearTimer--;if(clearTimer<=0)nextStage();updatePart();updateStars();return;}
   if(gState!=='PLAYING'&&gState!=='BOSS'){updateStars();return;}
@@ -1223,7 +1336,7 @@ function lbLoad(){try{return JSON.parse(localStorage.getItem(LB_KEY)||'[]');}cat
 function lbSave(e){let lb=lbLoad();lb.push(e);lb.sort((a,b)=>b.score-a.score);lb=lb.slice(0,8);try{localStorage.setItem(LB_KEY,JSON.stringify(lb));}catch(ex){}return lb;}
 function lbClear(){try{localStorage.removeItem(LB_KEY);}catch(e){}}
 
-let gameoverTimer=0,lbEntries=[];
+let gameoverTimer=0,lbEntries=[],selectedShip=0,shipAngle=0;
 
 function gameOver(){
   stopBGM();sfxLaserOff();
@@ -1235,9 +1348,17 @@ function gameOver(){
 function restartStage(){gameOver();}
 function startGame(){
   initAudio();resumeAC();
+  gState='SELECT';shipAngle=0;
+}
+function confirmShip(){
+  initAudio();resumeAC();
   stage=1;loop=1;score=0;P.hp=P.maxHp;
-  WEAPON.type='normal';WEAPON.level=1;WEAPON.laserTick=0;
-  resetStage();gState='PLAYING';startBGM(false);
+  resetStage();
+  const s=SHIPS[selectedShip];
+  P.spd=s.spd;P.sRate=s.sRate;
+  WEAPON.type=s.weapon;WEAPON.level=s.wlv;WEAPON.laserTick=0;
+  if(s.weapon==='laser')sfxLaserOn(1);
+  gState='PLAYING';startBGM(false);
 }
 
 // ═══════════════════════════════════════════════════
@@ -1267,6 +1388,7 @@ function render(){
   if(sk)ctx.restore();
   drawJoystick();drawSPBar();drawSPButton();drawHUD();
   if(gState==='MENU')renderMenu();
+  if(gState==='SELECT')renderShipSelect();
   if(gState==='CLEAR')renderClear();
   if(gState==='GAMEOVER')renderGameOver();
 }
@@ -1331,6 +1453,97 @@ function renderClear(){
   const prog=clearTimer/200;ctx.fillStyle='#222';ctx.fillRect(W/2-80,H/2+115,160,6);
   ctx.fillStyle=pc.color;ctx.fillRect(W/2-80,H/2+115,160*prog,6);
   ctx.fillStyle='#888';ctx.font='11px Courier New';ctx.fillText('下一關即將開始...',W/2,H/2+140);
+}
+
+function renderShipSelect(){
+  // Background (use stage 1 theme)
+  ctx.fillStyle='#030318';ctx.fillRect(0,0,W,H);
+  ctx.save();ctx.strokeStyle='#00e5ff';ctx.lineWidth=0.5;ctx.globalAlpha=0.05;
+  const gy=(Date.now()/30)%50;
+  for(let x=0;x<W;x+=50){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=gy;y<H;y+=50){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  ctx.globalAlpha=1;ctx.restore();
+  stars.forEach(s=>{ctx.fillStyle='rgba(255,255,255,'+s.a+')';ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();});
+
+  // Title
+  ctx.textAlign='center';
+  ctx.shadowColor='#00e5ff';ctx.shadowBlur=30;ctx.fillStyle='#00e5ff';
+  ctx.font='bold 22px Courier New';ctx.fillText('選擇機型',W/2,44);ctx.shadowBlur=0;
+  ctx.fillStyle='#446688';ctx.font='11px Courier New';
+  ctx.fillText('← → 切換  |  Enter/點擊 確認出擊',W/2,62);
+
+  // Three ship cards
+  const cardW=130,cardH=310,gap=10;
+  const totalW=cardW*3+gap*2;
+  const startX=(W-totalW)/2;
+
+  SHIPS.forEach((ship,i)=>{
+    const sel=(i===selectedShip);
+    const cx=startX+i*(cardW+gap)+cardW/2;
+    const cy=88+cardH/2+(sel?-6:0);
+    const cardX=startX+i*(cardW+gap),cardY=88;
+
+    // Card BG
+    ctx.save();
+    if(sel){ctx.shadowColor=ship.col;ctx.shadowBlur=22;}
+    ctx.fillStyle=sel?'rgba(12,12,32,0.95)':'rgba(6,6,18,0.85)';
+    ctx.beginPath();ctx.roundRect(cardX,cardY-(sel?6:0),cardW,cardH+(sel?6:0),10);ctx.fill();
+    ctx.strokeStyle=sel?ship.col:ship.col+'44';ctx.lineWidth=sel?2:1;ctx.stroke();
+    ctx.shadowBlur=0;ctx.restore();
+
+    // Ship preview
+    const previewY=cardY+105+(sel?-6:0);
+    drawShipAt(i,cx,previewY,shipAngle,1.0,ship.col);
+
+    // Ship name
+    ctx.save();
+    ctx.shadowColor=sel?ship.col:'transparent';ctx.shadowBlur=sel?12:0;
+    ctx.fillStyle=sel?ship.col:ship.col+'99';
+    ctx.font='bold 20px Courier New';ctx.textAlign='center';
+    ctx.fillText(ship.name,cx,cardY+28+(sel?-6:0));ctx.shadowBlur=0;
+    ctx.fillStyle='#556677';ctx.font='9px Courier New';
+    ctx.fillText(ship.sub,cx,cardY+42+(sel?-6:0));
+    ctx.restore();
+
+    // Desc
+    ctx.fillStyle=sel?'#ccd8e8':'#445566';ctx.font='10px Courier New';ctx.textAlign='center';
+    ctx.fillText(ship.desc,cx,cardY+194+(sel?-6:0));
+    ctx.fillStyle=sel?'#889aaa':'#334455';ctx.font='9px Courier New';
+    ctx.fillText(ship.hint,cx,cardY+210+(sel?-6:0));
+
+    // Weapon badge
+    const wlabels={normal:'標準砲',shotgun:'散彈砲',laser:'雷射砲'};
+    const wbg=sel?ship.col+'33':'rgba(0,0,0,0.4)';
+    ctx.fillStyle=wbg;ctx.beginPath();ctx.roundRect(cardX+8,cardY+222+(sel?-6:0),cardW-16,18,5);ctx.fill();
+    ctx.strokeStyle=sel?ship.col:ship.col+'44';ctx.lineWidth=1;ctx.stroke();
+    ctx.fillStyle=sel?ship.col:ship.col+'88';ctx.font='bold 10px Courier New';ctx.textAlign='center';
+    ctx.fillText(wlabels[ship.weapon],cx,cardY+234+(sel?-6:0));
+
+    // Stats bars
+    const statNames=['速度','火力','範圍'];
+    statNames.forEach((sn,si)=>{
+      const sy=cardY+252+(sel?-6:0)+si*18;
+      const bx=cardX+10,bw=cardW-20,bh=6;
+      ctx.fillStyle='#1a1a2a';ctx.fillRect(bx,sy,bw,bh);
+      ctx.fillStyle=sel?ship.col:ship.col+'88';
+      ctx.fillRect(bx,sy,bw*(ship.stat[si]/5),bh);
+      ctx.fillStyle=sel?'#aabbcc':'#445566';ctx.font='8px Courier New';ctx.textAlign='left';
+      ctx.fillText(sn,bx,sy-2);
+    });
+
+    ctx.restore&&null;
+  });
+
+  // Confirm button
+  const bl=Math.floor(Date.now()/500)%2;
+  const btnY=H-52;
+  ctx.shadowColor=SHIPS[selectedShip].col;ctx.shadowBlur=bl?20:8;
+  ctx.fillStyle=bl?SHIPS[selectedShip].col+'33':'rgba(0,0,0,0.6)';
+  ctx.beginPath();ctx.roundRect(W/2-80,btnY-16,160,34,8);ctx.fill();
+  ctx.strokeStyle=SHIPS[selectedShip].col;ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle=bl?SHIPS[selectedShip].col:'#ffffff';
+  ctx.font='bold 16px Courier New';ctx.textAlign='center';
+  ctx.fillText('出擊！LAUNCH',W/2,btnY+6);ctx.shadowBlur=0;
 }
 
 function renderGameOver(){
