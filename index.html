@@ -132,33 +132,49 @@ const Q={
   c6:1046.5,d6:1174.7,e6:1318.5
 };
 
-// 5-stage BGM patterns (16 × 8th-note steps each)
+// Dance-style BGM — 16×8th-note steps (2 bars of 4/4)
+// kick=four-on-floor  snare=backbeat  hat=closed hi-hat
 const BGM=[
-  {bpm:124,  // S1 C-major-pentatonic — upbeat
-   bass:[Q.c2,0,Q.g2,0,Q.c2,0,Q.e2,0, Q.f2,0,Q.c2,0,Q.g2,0,Q.a2,0],
-   mel: [Q.e4,0,Q.g4,0,Q.a4,0,Q.g4,0, Q.e4,0,Q.c4,0,Q.d4,0,Q.e4,0],
-   arp: [Q.c5,Q.e5,Q.g5,Q.e5, Q.c5,Q.g5,Q.a5,Q.g5, Q.f4,Q.a4,Q.c5,Q.a4, Q.g4,Q.a4,Q.g4,Q.e4],
-   pad: [Q.c3,Q.e3,Q.g3,Q.c4]},
-  {bpm:140,  // S2 G-minor-pentatonic — stormy
-   bass:[Q.g2,0,Q.d2,0,Q.g2,0,Q.f2,0, Q.c2,0,Q.d2,0,Q.bb2,0,Q.d2,0],
-   mel: [Q.g4,0,Q.bb4,0,Q.c5,0,Q.d5,0, Q.c5,0,Q.bb4,0,Q.g4,0,Q.f4,0],
-   arp: [Q.g5,Q.c5,Q.d5,Q.c5, Q.g5,Q.bb5,Q.d5,Q.bb5, Q.f5,Q.c5,Q.d5,Q.c5, Q.f5,Q.bb4,Q.c5,Q.bb4],
-   pad: [Q.g3,Q.bb3,Q.d3,Q.g3]},
-  {bpm:132,  // S3 D-minor-pentatonic — mysterious
-   bass:[Q.d2,0,Q.a2,0,Q.d2,0,Q.c2,0, Q.bb2,0,Q.f2,0,Q.a2,0,Q.c2,0],
-   mel: [Q.d4,0,Q.f4,0,Q.a4,0,Q.c5,0, Q.a4,0,Q.f4,0,Q.d4,0,Q.c4,0],
-   arp: [Q.d5,Q.f5,Q.a5,Q.c6, Q.a5,Q.f5,Q.d5,Q.f5, Q.bb4,Q.d5,Q.f5,Q.bb5, Q.f5,Q.d5,Q.bb4,Q.a4],
-   pad: [Q.d3,Q.f3,Q.a3,Q.d4]},
-  {bpm:156,  // S4 A-minor-pentatonic — aggressive
-   bass:[Q.a1,0,Q.e2,0,Q.a1,0,Q.g2,0, Q.f2,0,Q.c2,0,Q.g2,0,Q.e2,0],
-   mel: [Q.a4,0,Q.c5,0,Q.e5,0,Q.g5,0, Q.e5,0,Q.d5,0,Q.c5,0,Q.a4,0],
-   arp: [Q.a5,Q.e5,Q.c5,Q.e5, Q.a5,Q.g5,Q.e5,Q.g5, Q.c5,Q.e5,Q.g5,Q.c6, Q.g5,Q.e5,Q.c5,Q.a4],
-   pad: [Q.a2,Q.c3,Q.e3,Q.a3]},
-  {bpm:164,  // S5 E-minor-pentatonic — dark abyss
-   bass:[Q.e2,0,Q.b1,0,Q.g2,0,Q.b1,0, Q.a1,0,Q.d2,0,Q.e2,0,Q.g2,0],
-   mel: [Q.e4,0,Q.g4,0,Q.b4,0,Q.d5,0, Q.b4,0,Q.a4,0,Q.g4,0,Q.e4,0],
-   arp: [Q.e5,Q.g5,Q.b5,Q.d6, Q.b5,Q.g5,Q.e5,Q.g5, Q.a4,Q.b4,Q.d5,Q.e5, Q.d5,Q.b4,Q.a4,Q.g4],
-   pad: [Q.e3,Q.g3,Q.b3,Q.e4]},
+  {bpm:128, // S1 Neon Club — Am, driving house
+   kick: [1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0],
+   snare:[0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+   hat:  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+   bass: [Q.a2,0,Q.a2,Q.c3,Q.e2,0,Q.g2,0, Q.a2,0,Q.d2,0,Q.e2,0,Q.a2,Q.g2],
+   mel:  [Q.a4,0,Q.c5,0,Q.e5,0,Q.d5,0, Q.c5,0,Q.a4,0,Q.g4,0,Q.a4,0],
+   arp:  [Q.a5,Q.c5,Q.e5,Q.c5, Q.a5,Q.g5,Q.e5,Q.g5, Q.d5,Q.f5,Q.a5,Q.f5, Q.e5,Q.g5,Q.a5,Q.g5],
+   pad:  [Q.a3,Q.c4,Q.e4,Q.g4]},
+  {bpm:138, // S2 Electric Storm — Dm, pulsing trance
+   kick: [1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0],
+   snare:[0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+   hat:  [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+   bass: [Q.d2,0,Q.d2,Q.f2,Q.a2,0,Q.g2,0, Q.d2,0,Q.c2,0,Q.a1,0,Q.d2,Q.c2],
+   mel:  [Q.d4,0,Q.f4,0,Q.a4,0,Q.c5,0, Q.a4,0,Q.g4,0,Q.f4,0,Q.d4,0],
+   arp:  [Q.d5,Q.f5,Q.a5,Q.f5, Q.d5,Q.c5,Q.a4,Q.c5, Q.g4,Q.a4,Q.c5,Q.a4, Q.f4,Q.g4,Q.a4,Q.g4],
+   pad:  [Q.d3,Q.f3,Q.a3,Q.c4]},
+  {bpm:142, // S3 Quantum Beat — Gm, syncopated groove
+   kick: [1,0,0,1,1,0,0,0,1,0,0,1,1,0,0,0],
+   snare:[0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+   hat:  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+   bass: [Q.g2,0,Q.g2,Q.bb2,Q.d2,0,Q.c2,0, Q.g2,0,Q.f2,0,Q.d2,0,Q.g2,Q.f2],
+   mel:  [Q.g4,0,Q.bb4,0,Q.d5,0,Q.c5,0, Q.bb4,0,Q.g4,0,Q.f4,0,Q.g4,0],
+   arp:  [Q.g5,Q.bb5,Q.d5,Q.bb5, Q.g5,Q.f5,Q.d5,Q.f5, Q.c5,Q.d5,Q.f5,Q.d5, Q.bb4,Q.c5,Q.d5,Q.c5],
+   pad:  [Q.g3,Q.bb3,Q.d4,Q.f4]},
+  {bpm:152, // S4 Fire Rave — Am hard, double kick
+   kick: [1,0,1,0,1,0,0,0,1,0,1,0,1,0,0,0],
+   snare:[0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],
+   hat:  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+   bass: [Q.a1,Q.c2,Q.a1,0,Q.e2,0,Q.g2,Q.e2, Q.a1,Q.c2,Q.a1,0,Q.d2,0,Q.e2,0],
+   mel:  [Q.a4,0,Q.c5,0,Q.e5,Q.g5,Q.e5,0, Q.d5,0,Q.c5,0,Q.a4,0,Q.b4,0],
+   arp:  [Q.a5,Q.e5,Q.c5,Q.e5, Q.a5,Q.g5,Q.e5,Q.c5, Q.g4,Q.a4,Q.c5,Q.e5, Q.a5,Q.g5,Q.e5,Q.c5],
+   pad:  [Q.a2,Q.c3,Q.e3,Q.g3]},
+  {bpm:160, // S5 Deep Core — Em, maximal dark techno
+   kick: [1,0,0,0,1,1,0,0,1,0,0,0,1,1,0,0],
+   snare:[0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+   hat:  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+   bass: [Q.e2,0,Q.e2,Q.g2,Q.b1,0,Q.a2,0, Q.e2,0,Q.d2,0,Q.b1,0,Q.e2,Q.d2],
+   mel:  [Q.e4,0,Q.g4,0,Q.b4,0,Q.d5,0, Q.b4,0,Q.a4,0,Q.g4,0,Q.e4,0],
+   arp:  [Q.e5,Q.g5,Q.b5,Q.g5, Q.e5,Q.d5,Q.b4,Q.d5, Q.a4,Q.b4,Q.d5,Q.b4, Q.g4,Q.a4,Q.b4,Q.a4],
+   pad:  [Q.e3,Q.g3,Q.b3,Q.d4]},
 ];
 
 function initAudio(){
@@ -202,6 +218,42 @@ function noiseBurst(dur,vol,bpFreq){
     g.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+dur);
     src.start();src.stop(AC.currentTime+dur);
   }catch(e){}
+}
+
+// Scheduled noise burst for drum sequencer
+function noiseBurstAt(dur,vol,bpFreq,when){
+  if(!AC||audioMuted)return;
+  try{
+    const sz=Math.ceil(AC.sampleRate*dur),buf=AC.createBuffer(1,sz,AC.sampleRate);
+    const d=buf.getChannelData(0);for(let i=0;i<sz;i++)d[i]=Math.random()*2-1;
+    const src=AC.createBufferSource();src.buffer=buf;
+    const f=AC.createBiquadFilter();f.type='bandpass';f.frequency.value=bpFreq;f.Q.value=1.0;
+    const g=AC.createGain();
+    src.connect(f);f.connect(g);g.connect(masterGain);
+    const t=when!=null?when:AC.currentTime;
+    g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.001,t+dur);
+    src.start(t);src.stop(t+dur+0.01);
+  }catch(e){}
+}
+function bgmKick(t,vol){
+  if(!AC||audioMuted)return;
+  noiseBurstAt(0.09,vol*0.55,90,t);
+  try{
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.connect(g);g.connect(masterGain);o.type='sine';
+    o.frequency.setValueAtTime(200,t);o.frequency.exponentialRampToValueAtTime(42,t+0.09);
+    g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.13);
+    o.start(t);o.stop(t+0.14);
+  }catch(e){}
+}
+function bgmSnare(t,vol){
+  if(!AC||audioMuted)return;
+  noiseBurstAt(0.14,vol,700,t);
+  tone(180,'square',0.003,0.02,0.03,vol*0.35,t);
+}
+function bgmHat(t,vol){
+  if(!AC||audioMuted)return;
+  noiseBurstAt(0.035,vol,9000,t);
 }
 
 // ── SFX Library ───────────────────────────────────
@@ -337,10 +389,14 @@ function scheduleBGM(){
   const sd=60/bpm/2; // 8th-note duration
   while(bgmNextT<AC.currentTime+LOOKAHEAD){
     const s=bgmStep%16,t=bgmNextT;
-    if(bgm.bass[s]>0)tone(bgm.bass[s],'sawtooth',0.01,sd*0.55,0.04,audioMuted?0:0.14,t);
-    if(bgm.mel[s]>0) tone(bgm.mel[s],'square', 0.01,sd*0.62,0.04,audioMuted?0:0.09,t);
-    if(bgm.arp[s]>0) tone(bgm.arp[s],'triangle',0.005,sd*0.28,0.02,audioMuted?0:0.055,t);
-    if(s===0) bgm.pad.forEach((f,i)=>{if(f>0)tone(f,'sine',0.07,sd*13,0.2,audioMuted?0:0.05,t+i*0.018);});
+    const kv=bgmBoss?0.60:0.46, sv=bgmBoss?0.36:0.26, hv=bgmBoss?0.13:0.09;
+    if(bgm.kick[s])  bgmKick(t,kv);
+    if(bgm.snare[s]) bgmSnare(t,sv);
+    if(bgm.hat[s])   bgmHat(t,hv);
+    if(bgm.bass[s]>0)tone(bgm.bass[s],'sawtooth',0.008,sd*0.38,0.03,audioMuted?0:0.18,t);
+    if(bgm.mel[s]>0) tone(bgm.mel[s],'square',   0.010,sd*0.55,0.04,audioMuted?0:0.10,t);
+    if(bgm.arp[s]>0) tone(bgm.arp[s],'triangle', 0.004,sd*0.20,0.02,audioMuted?0:0.058,t);
+    if(s===0) bgm.pad.forEach((f,i)=>{if(f>0)tone(f,'sine',0.06,sd*14,0.18,audioMuted?0:0.045,t+i*0.016);});
     bgmStep++;bgmNextT+=sd;
   }
   bgmTimeout=setTimeout(scheduleBGM,SCHED_MS);
