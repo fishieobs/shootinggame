@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="13" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow2" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow3" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <radialGradient id="bg" cx="50%" cy="58%" r="62%">
+      <stop offset="0%" stop-color="#060622"/>
+      <stop offset="100%" stop-color="#00000c"/>
+    </radialGradient>
+    <radialGradient id="engineGlow" cx="50%" cy="15%" r="85%">
+      <stop offset="0%" stop-color="#00e5ffcc"/>
+      <stop offset="55%" stop-color="#00e5ff2a"/>
+      <stop offset="100%" stop-color="#00e5ff00"/>
+    </radialGradient>
+    <radialGradient id="coreGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="28%" stop-color="#00e5ff"/>
+      <stop offset="65%" stop-color="#00e5ff44"/>
+      <stop offset="100%" stop-color="#00e5ff00"/>
+    </radialGradient>
+    <linearGradient id="bodyGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#00e5ff55"/>
+      <stop offset="45%" stop-color="#090928"/>
+      <stop offset="100%" stop-color="#00e5ff33"/>
+    </linearGradient>
+    <linearGradient id="wingL" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00e5ffbb"/>
+      <stop offset="100%" stop-color="#00e5ff22"/>
+    </linearGradient>
+    <linearGradient id="wingR" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00e5ffbb"/>
+      <stop offset="100%" stop-color="#00e5ff22"/>
+    </linearGradient>
+    <linearGradient id="bladeGrad" x1="50%" y1="100%" x2="50%" y2="0%">
+      <stop offset="0%" stop-color="#00e5ff"/>
+      <stop offset="100%" stop-color="#eefffe"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+
+  <!-- Subtle tech grid -->
+  <g opacity="0.07" stroke="#00e5ff" stroke-width="1" fill="none">
+    <line x1="171" y1="0" x2="171" y2="512"/>
+    <line x1="341" y1="0" x2="341" y2="512"/>
+    <line x1="0" y1="171" x2="512" y2="171"/>
+    <line x1="0" y1="341" x2="512" y2="341"/>
+  </g>
+
+  <!-- Decorative rings -->
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#00e5ff" stroke-width="1.5" opacity="0.14"/>
+  <circle cx="256" cy="256" r="206" fill="none" stroke="#00e5ff" stroke-width="1"   opacity="0.09"/>
+
+  <!-- Engine exhaust glow -->
+  <ellipse cx="256" cy="432" rx="58" ry="34" fill="url(#engineGlow)" filter="url(#glow)"/>
+  <ellipse cx="214" cy="420" rx="28" ry="18" fill="#00ccff" opacity="0.24" filter="url(#glow)"/>
+  <ellipse cx="298" cy="420" rx="28" ry="18" fill="#00ccff" opacity="0.24" filter="url(#glow)"/>
+
+  <!-- Left wing -->
+  <path d="M 242,248 L 102,385 L 142,410 L 242,308 Z"
+        fill="url(#wingL)" stroke="#00e5ff" stroke-width="2.5" opacity="0.87"/>
+  <line x1="142" y1="388" x2="237" y2="294" stroke="#00e5ff" stroke-width="1.8" opacity="0.42"/>
+
+  <!-- Right wing -->
+  <path d="M 270,248 L 410,385 L 370,410 L 270,308 Z"
+        fill="url(#wingR)" stroke="#00e5ff" stroke-width="2.5" opacity="0.87"/>
+  <line x1="370" y1="388" x2="275" y2="294" stroke="#00e5ff" stroke-width="1.8" opacity="0.42"/>
+
+  <!-- Fuselage body -->
+  <path d="M 256,92 L 296,210 L 300,404 L 256,434 L 212,404 L 216,210 Z"
+        fill="url(#bodyGrad)" stroke="#00e5ff" stroke-width="3"/>
+
+  <!-- Fuselage details -->
+  <line x1="256" y1="112" x2="256" y2="414"  stroke="#00e5ff" stroke-width="1.5" opacity="0.22"/>
+  <line x1="242" y1="238" x2="270" y2="238"  stroke="#00e5ff" stroke-width="1.5" opacity="0.38"/>
+  <line x1="240" y1="320" x2="272" y2="320"  stroke="#00e5ff" stroke-width="1.5" opacity="0.38"/>
+
+  <!-- Nose cockpit -->
+  <ellipse cx="256" cy="136" rx="20" ry="34" fill="#00ccff" opacity="0.42" filter="url(#glow2)"/>
+  <circle cx="256" cy="106"  r="11" fill="#00e5ff" opacity="0.88" filter="url(#glow2)"/>
+
+  <!-- 3-blade turbine (identical blades, rotated 120° each) -->
+  <!-- Blade shape: teardrop pointing "up" in local coords -->
+  <g transform="translate(256,272)" filter="url(#glow2)">
+    <path d="M 0,0 C 10,-22 14,-52 5,-78 C -5,-52 -10,-22 0,0 Z"
+          fill="url(#bladeGrad)" opacity="0.93"/>
+    <path d="M 0,0 C 10,-22 14,-52 5,-78 C -5,-52 -10,-22 0,0 Z"
+          transform="rotate(120)" fill="url(#bladeGrad)" opacity="0.93"/>
+    <path d="M 0,0 C 10,-22 14,-52 5,-78 C -5,-52 -10,-22 0,0 Z"
+          transform="rotate(240)" fill="url(#bladeGrad)" opacity="0.93"/>
+  </g>
+
+  <!-- Core energy burst -->
+  <circle cx="256" cy="272" r="40" fill="url(#coreGrad)" filter="url(#glow)"/>
+  <circle cx="256" cy="272" r="15" fill="#ffffff" opacity="0.98" filter="url(#glow3)"/>
+  <circle cx="256" cy="272" r="6"  fill="#ffffff"/>
+
+  <!-- Outer frame glow -->
+  <rect width="512" height="512" rx="96" fill="none" stroke="#00e5ff" stroke-width="3.5" opacity="0.28"/>
+</svg>
