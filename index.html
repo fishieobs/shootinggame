@@ -627,93 +627,139 @@ function shipCore(c){
   ctx.fillStyle='#fff';ctx.shadowBlur=8;ctx.beginPath();ctx.arc(0,-2,3,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
 }
 
-function drawShip0(blade,c){ // 颱風 - 3-blade balanced
+function drawShip0(blade,c){ // 颱風 - delta wing fighter, 3-blade
   const g=Math.sin(Date.now()/72)*0.5+0.5;
-  for(let j=-1;j<=1;j+=2)shipExhaust(j*9,g,c);
-  ctx.shadowColor=c;ctx.shadowBlur=10;
-  for(let j=-1;j<=1;j+=2)shipWing(j,c);
-  ctx.shadowBlur=16;
-  shipFuselage(c,[0,-22, 10,-8, 11,6, 9,22, -9,22, -11,6, -10,-8]);
+  // 3 engine exhaust glows
+  [[-13,21],[13,21],[0,25]].forEach(([ex,ey])=>{
+    const eg=ctx.createRadialGradient(ex,ey,0,ex,ey,9+g*4);
+    eg.addColorStop(0,c+'ee');eg.addColorStop(0.45,c+'44');eg.addColorStop(1,'transparent');
+    ctx.fillStyle=eg;ctx.beginPath();ctx.arc(ex,ey,9+g*4,0,Math.PI*2);ctx.fill();
+  });
+  ctx.shadowColor=c;ctx.shadowBlur=14;
+  // Integrated delta wing body
+  const fg=ctx.createLinearGradient(0,-24,0,25);
+  fg.addColorStop(0,c+'66');fg.addColorStop(0.42,'#0c1430');fg.addColorStop(1,c+'33');
+  ctx.fillStyle=fg;
+  ctx.beginPath();
+  ctx.moveTo(0,-24);
+  ctx.lineTo(9,-10);ctx.lineTo(34,6);ctx.lineTo(26,15);
+  ctx.lineTo(14,21);ctx.lineTo(6,25);ctx.lineTo(-6,25);
+  ctx.lineTo(-14,21);ctx.lineTo(-26,15);ctx.lineTo(-34,6);ctx.lineTo(-9,-10);
+  ctx.closePath();
+  ctx.fill();ctx.strokeStyle=c;ctx.lineWidth=1.5;ctx.stroke();
+  // Panel lines
   ctx.strokeStyle=c+'44';ctx.lineWidth=0.7;
-  ctx.beginPath();ctx.moveTo(0,-20);ctx.lineTo(0,20);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(-9,-2);ctx.lineTo(9,-2);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(-8,10);ctx.lineTo(8,10);ctx.stroke();
+  [[0,-22,0,23],[10,-8,26,9],[-10,-8,-26,9],[-16,6,16,6],[-13,16,13,16]].forEach(([x1,y1,x2,y2])=>{
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  });
+  // Cockpit canopy
+  const cv=ctx.createRadialGradient(0,-15,0,0,-15,6);
+  cv.addColorStop(0,'#cceeff');cv.addColorStop(0.55,c+'88');cv.addColorStop(1,'transparent');
+  ctx.fillStyle=cv;ctx.shadowBlur=8;
+  ctx.beginPath();ctx.ellipse(0,-15,4,6,0,0,Math.PI*2);ctx.fill();
+  // 3-blade turbine
   ctx.rotate(blade);ctx.shadowColor=c;
   for(let i=0;i<3;i++){ctx.save();ctx.rotate((Math.PI*2/3)*i);
-    ctx.beginPath();ctx.moveTo(0,-8);ctx.bezierCurveTo(7,-18,11,-33,3,-41);ctx.bezierCurveTo(0,-37,-1,-29,0,-21);ctx.bezierCurveTo(-5,-17,-5,-13,0,-8);ctx.closePath();
-    const bg=ctx.createLinearGradient(0,-8,3,-41);bg.addColorStop(0,c);bg.addColorStop(1,'#fff');
-    ctx.fillStyle=bg;ctx.globalAlpha=0.92;ctx.shadowBlur=8;ctx.fill();
-    ctx.globalAlpha=0.45;ctx.strokeStyle='#fff';ctx.lineWidth=0.6;ctx.stroke();ctx.globalAlpha=1;ctx.restore();}
+    ctx.beginPath();ctx.moveTo(0,-7);ctx.bezierCurveTo(7,-17,10,-31,2,-38);ctx.bezierCurveTo(0,-34,-1,-26,0,-18);ctx.bezierCurveTo(-5,-14,-5,-10,0,-7);ctx.closePath();
+    const bg=ctx.createLinearGradient(0,-7,2,-38);bg.addColorStop(0,c);bg.addColorStop(1,'#fff');
+    ctx.fillStyle=bg;ctx.globalAlpha=0.9;ctx.shadowBlur=7;ctx.fill();ctx.globalAlpha=1;ctx.restore();}
   ctx.rotate(-blade);ctx.shadowBlur=0;
   shipCore(c);
 }
 
-function drawShip1(blade,c){ // 暴風 - 4-blade shotgun
+function drawShip1(blade,c){ // 暴風 - heavy gunship, 4-blade
   const g=Math.sin(Date.now()/60)*0.5+0.5;
-  // Triple exhaust
-  for(let jx of[-12,0,12])shipExhaust(jx,g*0.8,c);
-  ctx.shadowColor=c;ctx.shadowBlur=12;
-  // Wider swept wings with cannon pods
-  for(let j=-1;j<=1;j+=2){
-    ctx.beginPath();ctx.moveTo(j*8,-6);ctx.lineTo(j*36,4);ctx.lineTo(j*34,18);ctx.lineTo(j*8,14);ctx.closePath();
-    const wg=ctx.createLinearGradient(0,4,j*36,4);wg.addColorStop(0,c+'cc');wg.addColorStop(1,c+'22');
-    ctx.fillStyle=wg;ctx.fill();ctx.strokeStyle=c+'88';ctx.lineWidth=1;ctx.stroke();
-    // Gun pod
-    ctx.fillStyle=c+'bb';ctx.beginPath();ctx.ellipse(j*34,10,5,9,0,0,Math.PI*2);ctx.fill();
-    ctx.strokeStyle=c;ctx.lineWidth=1;ctx.stroke();
-    // Muzzle
-    ctx.fillStyle=c;ctx.shadowBlur=8;ctx.beginPath();ctx.arc(j*34,18,3.5,0,Math.PI*2);ctx.fill();
-    ctx.shadowBlur=0;
-  }
-  // Wider body
-  ctx.shadowBlur=16;
-  shipFuselage(c,[0,-18, 13,-6, 14,6, 11,22, -11,22, -14,6, -13,-6]);
+  // 4 engine exhausts
+  [[-18,22],[18,22],[-7,26],[7,26]].forEach(([ex,ey])=>{
+    const eg=ctx.createRadialGradient(ex,ey,0,ex,ey,8+g*3);
+    eg.addColorStop(0,c+'ee');eg.addColorStop(0.5,c+'44');eg.addColorStop(1,'transparent');
+    ctx.fillStyle=eg;ctx.beginPath();ctx.arc(ex,ey,8+g*3,0,Math.PI*2);ctx.fill();
+  });
+  ctx.shadowColor=c;ctx.shadowBlur=14;
+  const fg=ctx.createLinearGradient(0,-20,0,28);
+  fg.addColorStop(0,c+'55');fg.addColorStop(0.45,'#0c1430');fg.addColorStop(1,c+'44');
+  ctx.fillStyle=fg;
+  // Wide heavy delta body
+  ctx.beginPath();
+  ctx.moveTo(0,-20);
+  ctx.lineTo(11,-8);ctx.lineTo(40,2);ctx.lineTo(38,12);
+  ctx.lineTo(28,18);ctx.lineTo(20,24);ctx.lineTo(8,27);
+  ctx.lineTo(-8,27);ctx.lineTo(-20,24);ctx.lineTo(-28,18);
+  ctx.lineTo(-38,12);ctx.lineTo(-40,2);ctx.lineTo(-11,-8);
+  ctx.closePath();
+  ctx.fill();ctx.strokeStyle=c;ctx.lineWidth=1.5;ctx.stroke();
+  // Wing-tip gun pods
+  [-40,40].forEach(jx=>{
+    ctx.fillStyle=c+'bb';ctx.beginPath();ctx.ellipse(jx,6,5,9,0,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle=c;ctx.lineWidth=1;ctx.shadowBlur=0;ctx.stroke();
+    ctx.fillStyle=c;ctx.shadowBlur=8;ctx.beginPath();ctx.arc(jx,14,3.5,0,Math.PI*2);ctx.fill();
+  });
+  // Panel lines
   ctx.strokeStyle=c+'44';ctx.lineWidth=0.7;
-  ctx.beginPath();ctx.moveTo(0,-16);ctx.lineTo(0,20);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(-11,-2);ctx.lineTo(11,-2);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(-10,10);ctx.lineTo(10,10);ctx.stroke();
+  [[0,-18,0,25],[-14,4,14,4],[-12,17,12,17],[11,-6,32,6],[-11,-6,-32,6]].forEach(([x1,y1,x2,y2])=>{
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  });
+  // Cockpit canopy (wider)
+  const cv=ctx.createRadialGradient(0,-12,0,0,-12,7);
+  cv.addColorStop(0,'#cceeff');cv.addColorStop(0.55,c+'88');cv.addColorStop(1,'transparent');
+  ctx.fillStyle=cv;ctx.shadowBlur=8;
+  ctx.beginPath();ctx.ellipse(0,-12,5,7,0,0,Math.PI*2);ctx.fill();
   // 4-blade turbine
   ctx.rotate(blade);ctx.shadowColor=c;
   for(let i=0;i<4;i++){ctx.save();ctx.rotate((Math.PI/2)*i);
-    ctx.beginPath();ctx.moveTo(0,-7);ctx.bezierCurveTo(6,-15,9,-26,2,-33);ctx.bezierCurveTo(-1,-30,-2,-22,0,-15);ctx.bezierCurveTo(-4,-12,-4,-9,0,-7);ctx.closePath();
-    const bg=ctx.createLinearGradient(0,-7,2,-33);bg.addColorStop(0,c);bg.addColorStop(1,'#fff');
-    ctx.fillStyle=bg;ctx.globalAlpha=0.9;ctx.shadowBlur=8;ctx.fill();
-    ctx.globalAlpha=0.4;ctx.strokeStyle='#fff';ctx.lineWidth=0.6;ctx.stroke();ctx.globalAlpha=1;ctx.restore();}
+    ctx.beginPath();ctx.moveTo(0,-6);ctx.bezierCurveTo(6,-13,8,-24,2,-30);ctx.bezierCurveTo(-1,-27,-2,-20,0,-14);ctx.bezierCurveTo(-4,-11,-4,-8,0,-6);ctx.closePath();
+    const bg=ctx.createLinearGradient(0,-6,2,-30);bg.addColorStop(0,c);bg.addColorStop(1,'#fff');
+    ctx.fillStyle=bg;ctx.globalAlpha=0.88;ctx.shadowBlur=7;ctx.fill();ctx.globalAlpha=1;ctx.restore();}
   ctx.rotate(-blade);ctx.shadowBlur=0;
   shipCore(c);
 }
 
-function drawShip2(blade,c){ // 閃電 - 2-blade laser
+function drawShip2(blade,c){ // 閃電 - sleek interceptor, 2-blade
   const g=Math.sin(Date.now()/50)*0.5+0.5;
-  // Single wide exhaust
-  const eg=ctx.createRadialGradient(0,20,0,0,20,16+g*5);
-  eg.addColorStop(0,c+'ee');eg.addColorStop(0.5,c+'55');eg.addColorStop(1,'transparent');
-  ctx.fillStyle=eg;ctx.beginPath();ctx.arc(0,20,16+g*5,0,Math.PI*2);ctx.fill();
-  ctx.shadowColor=c;ctx.shadowBlur=10;
-  // Swept delta wings
-  for(let j=-1;j<=1;j+=2){
-    ctx.beginPath();ctx.moveTo(j*6,-8);ctx.lineTo(j*26,2);ctx.lineTo(j*20,20);ctx.lineTo(j*6,16);ctx.closePath();
-    const wg=ctx.createLinearGradient(0,0,j*26,2);wg.addColorStop(0,c+'cc');wg.addColorStop(1,c+'18');
-    ctx.fillStyle=wg;ctx.fill();ctx.strokeStyle=c+'88';ctx.lineWidth=1;ctx.stroke();
-  }
-  // Sleek elongated body
-  ctx.shadowBlur=16;
-  shipFuselage(c,[0,-28, 8,-10, 9,6, 8,24, -8,24, -9,6, -8,-10]);
-  ctx.strokeStyle=c+'44';ctx.lineWidth=0.7;
-  ctx.beginPath();ctx.moveTo(0,-26);ctx.lineTo(0,22);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(-7,4);ctx.lineTo(7,4);ctx.stroke();
+  // Single large central exhaust
+  const eg=ctx.createRadialGradient(0,28,0,0,28,16+g*6);
+  eg.addColorStop(0,c+'ee');eg.addColorStop(0.5,c+'44');eg.addColorStop(1,'transparent');
+  ctx.fillStyle=eg;ctx.beginPath();ctx.arc(0,28,16+g*6,0,Math.PI*2);ctx.fill();
+  // Small stabilizer glows
+  [[-10,22],[10,22]].forEach(([ex,ey])=>{
+    const sg=ctx.createRadialGradient(ex,ey,0,ex,ey,5+g*2);
+    sg.addColorStop(0,c+'cc');sg.addColorStop(1,'transparent');
+    ctx.fillStyle=sg;ctx.beginPath();ctx.arc(ex,ey,5+g*2,0,Math.PI*2);ctx.fill();
+  });
+  ctx.shadowColor=c;ctx.shadowBlur=14;
+  const fg=ctx.createLinearGradient(0,-30,0,28);
+  fg.addColorStop(0,c+'77');fg.addColorStop(0.35,'#0a1030');fg.addColorStop(1,c+'44');
+  ctx.fillStyle=fg;
+  // Slim swept needle body
+  ctx.beginPath();
+  ctx.moveTo(0,-30);
+  ctx.lineTo(6,-16);ctx.lineTo(26,0);ctx.lineTo(22,10);
+  ctx.lineTo(12,18);ctx.lineTo(8,26);
+  ctx.lineTo(-8,26);ctx.lineTo(-12,18);
+  ctx.lineTo(-22,10);ctx.lineTo(-26,0);ctx.lineTo(-6,-16);
+  ctx.closePath();
+  ctx.fill();ctx.strokeStyle=c;ctx.lineWidth=1.5;ctx.stroke();
   // Energy ring (laser theme)
-  const ringPulse=0.7+Math.sin(Date.now()/200)*0.3;
-  ctx.beginPath();ctx.arc(0,-6,18+ringPulse*2,0,Math.PI*2);
-  ctx.strokeStyle=c+(Math.floor(ringPulse*99+10)).toString(16).padStart(2,'0');
+  const rp=0.7+Math.sin(Date.now()/200)*0.3;
+  ctx.beginPath();ctx.arc(0,-4,19+rp*2,0,Math.PI*2);
+  ctx.strokeStyle=c+Math.floor(rp*80+20).toString(16).padStart(2,'0');
   ctx.lineWidth=1;ctx.setLineDash([4,5]);ctx.stroke();ctx.setLineDash([]);
+  // Panel lines
+  ctx.strokeStyle=c+'44';ctx.lineWidth=0.7;
+  [[0,-28,0,25],[8,-14,22,4],[-8,-14,-22,4],[-14,8,14,8],[-10,18,10,18]].forEach(([x1,y1,x2,y2])=>{
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  });
+  // Cockpit canopy (narrow)
+  const cv=ctx.createRadialGradient(0,-18,0,0,-18,5);
+  cv.addColorStop(0,'#cceeff');cv.addColorStop(0.55,c+'88');cv.addColorStop(1,'transparent');
+  ctx.fillStyle=cv;ctx.shadowBlur=8;
+  ctx.beginPath();ctx.ellipse(0,-18,3.5,6,0,0,Math.PI*2);ctx.fill();
   // 2-blade long turbine
   ctx.rotate(blade);ctx.shadowColor=c;
   for(let i=0;i<2;i++){ctx.save();ctx.rotate(Math.PI*i);
-    ctx.beginPath();ctx.moveTo(0,-8);ctx.bezierCurveTo(7,-20,9,-38,1,-46);ctx.bezierCurveTo(-2,-42,-3,-32,0,-22);ctx.bezierCurveTo(-5,-18,-5,-13,0,-8);ctx.closePath();
-    const bg=ctx.createLinearGradient(0,-8,1,-46);bg.addColorStop(0,c);bg.addColorStop(0.6,'#cc88ff');bg.addColorStop(1,'#fff');
-    ctx.fillStyle=bg;ctx.globalAlpha=0.93;ctx.shadowBlur=10;ctx.fill();
-    ctx.globalAlpha=0.4;ctx.strokeStyle='#fff';ctx.lineWidth=0.7;ctx.stroke();ctx.globalAlpha=1;ctx.restore();}
+    ctx.beginPath();ctx.moveTo(0,-7);ctx.bezierCurveTo(7,-18,8,-36,1,-44);ctx.bezierCurveTo(-2,-40,-3,-30,0,-20);ctx.bezierCurveTo(-5,-16,-5,-12,0,-7);ctx.closePath();
+    const bg=ctx.createLinearGradient(0,-7,1,-44);bg.addColorStop(0,c);bg.addColorStop(0.6,'#cc88ff');bg.addColorStop(1,'#fff');
+    ctx.fillStyle=bg;ctx.globalAlpha=0.91;ctx.shadowBlur=9;ctx.fill();ctx.globalAlpha=1;ctx.restore();}
   ctx.rotate(-blade);ctx.shadowBlur=0;
   shipCore(c);
 }
