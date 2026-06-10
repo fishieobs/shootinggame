@@ -263,6 +263,27 @@ function bgmHat(t,vol){
   if(!AC||audioMuted)return;
   noiseBurstAt(0.035,vol,9000,t);
 }
+function bgmCrash(t,vol){
+  if(!AC||audioMuted)return;
+  noiseBurstAt(0.9,vol,8500,t);
+  noiseBurstAt(0.55,vol*0.5,4500,t);
+}
+function bgmTom(t,vol,freq){
+  if(!AC||audioMuted)return;
+  try{
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.connect(g);g.connect(masterGain);o.type='sine';
+    o.frequency.setValueAtTime(freq,t);o.frequency.exponentialRampToValueAtTime(freq*0.55,t+0.16);
+    g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.2);
+    o.start(t);o.stop(t+0.22);
+  }catch(e){}
+  noiseBurstAt(0.06,vol*0.3,300,t);
+}
+// Detuned oscillator pair — fat "super-saw" feel
+function toneDual(freq,type,atk,sus,rel,vol,when){
+  tone(freq*0.996,type,atk,sus,rel,vol*0.6,when);
+  tone(freq*1.004,type,atk,sus,rel,vol*0.6,when);
+}
 
 // ── SFX Library ───────────────────────────────────
 function sfxShoot(){
@@ -395,16 +416,32 @@ function scheduleBGM(){
   const bgm=BGM[Math.min(stage-1,4)];
   const bpm=bgmBoss?bgm.bpm*1.3:bgm.bpm;
   const sd=60/bpm/2; // 8th-note duration
+  const kv=bgmBoss?0.62:0.48, sv=bgmBoss?0.38:0.27, hv=bgmBoss?0.13:0.09;
   while(bgmNextT<AC.currentTime+LOOKAHEAD){
-    const s=bgmStep%16,t=bgmNextT;
-    const kv=bgmBoss?0.60:0.46, sv=bgmBoss?0.36:0.26, hv=bgmBoss?0.13:0.09;
+    const s=bgmStep%16,t=bgmNextT,cyc=Math.floor(bgmStep/16);
     if(bgm.kick[s])  bgmKick(t,kv);
     if(bgm.snare[s]) bgmSnare(t,sv);
     if(bgm.hat[s])   bgmHat(t,hv);
-    if(bgm.bass[s]>0)tone(bgm.bass[s],'sawtooth',0.008,sd*0.38,0.03,audioMuted?0:0.18,t);
-    if(bgm.mel[s]>0) tone(bgm.mel[s],'square',   0.010,sd*0.55,0.04,audioMuted?0:0.10,t);
+    // Tom fill on the last beat of every 4th cycle — rolling thunder into the next bar
+    if(cyc%4===3&&s>=12)bgmTom(t,sv*0.95,[210,170,140,112][s-12]);
+    if(bgm.bass[s]>0){
+      toneDual(bgm.bass[s],'sawtooth',0.008,sd*0.38,0.03,audioMuted?0:0.15,t); // fat detuned bass
+      tone(bgm.bass[s]/2,'sine',0.008,sd*0.45,0.05,audioMuted?0:0.14,t);       // sub-bass octave
+    }
+    if(bgm.mel[s]>0){
+      tone(bgm.mel[s],'square',0.010,sd*0.55,0.04,audioMuted?0:0.10,t);
+      tone(bgm.mel[s]*2,'sawtooth',0.014,sd*0.50,0.06,audioMuted?0:0.034,t);   // octave shimmer
+    }
     if(bgm.arp[s]>0) tone(bgm.arp[s],'triangle', 0.004,sd*0.20,0.02,audioMuted?0:0.058,t);
-    if(s===0) bgm.pad.forEach((f,i)=>{if(f>0)tone(f,'sine',0.06,sd*14,0.18,audioMuted?0:0.045,t+i*0.016);});
+    if(s===0){
+      bgmCrash(t,bgmBoss?0.26:0.17); // cymbal wash at every bar start
+      tone(bgm.pad[0]/2,'sine',0.12,sd*14,0.4,audioMuted?0:0.085,t); // deep root drone
+      bgm.pad.forEach((f,i)=>{if(f>0){
+        tone(f,'sine',0.08,sd*14,0.28,audioMuted?0:0.055,t+i*0.016);
+        tone(f*1.005,'triangle',0.11,sd*13,0.32,audioMuted?0:0.030,t+i*0.022); // detuned swell
+      }});
+      if(bgmBoss)tone(bgm.pad[2]*2,'sawtooth',0.15,sd*12,0.4,audioMuted?0:0.022,t); // boss high tension layer
+    }
     bgmStep++;bgmNextT+=sd;
   }
   bgmTimeout=setTimeout(scheduleBGM,SCHED_MS);
