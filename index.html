@@ -183,6 +183,22 @@ const BGM=[
    mel:  [Q.e4,0,Q.g4,0,Q.b4,0,Q.d5,0, Q.b4,0,Q.a4,0,Q.g4,0,Q.e4,0],
    arp:  [Q.e5,Q.g5,Q.b5,Q.g5, Q.e5,Q.d5,Q.b4,Q.d5, Q.a4,Q.b4,Q.d5,Q.b4, Q.g4,Q.a4,Q.b4,Q.a4],
    pad:  [Q.e3,Q.g3,Q.b3,Q.d4]},
+  {bpm:168, // S6 Nebula Rift — Bm, hyper industrial
+   kick: [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+   snare:[0,0,0,0,1,0,0,1,0,0,0,0,1,0,0,0],
+   hat:  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+   bass: [Q.b1,0,Q.b1,Q.d2,Q.f2,0,Q.g2,0, Q.b1,Q.d2,Q.b1,0,Q.e2,0,Q.f2,Q.d2],
+   mel:  [Q.b4,0,Q.d5,0,Q.f5,0,Q.g5,0, Q.f5,0,Q.d5,0,Q.b4,0,Q.d5,0],
+   arp:  [Q.b5,Q.d5,Q.f5,Q.d5, Q.b5,Q.a5,Q.g5,Q.a5, Q.e5,Q.g5,Q.b5,Q.g5, Q.d5,Q.f5,Q.b4,Q.f5],
+   pad:  [Q.b3,Q.d4,Q.f4,Q.a4]},
+  {bpm:176, // S7 End of Space-Time — Gm, chaos maximum
+   kick: [1,0,1,0,1,1,0,1,1,0,1,0,1,1,0,0],
+   snare:[0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+   hat:  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+   bass: [Q.g2,0,Q.g2,Q.bb2,Q.d2,Q.e2,Q.d2,0, Q.g2,0,Q.g2,0,Q.c2,0,Q.d2,Q.c2],
+   mel:  [Q.g5,0,Q.bb5,0,Q.d5,Q.e5,Q.d5,0, Q.bb4,0,Q.g4,0,Q.a4,Q.b4,Q.a4,0],
+   arp:  [Q.g5,Q.bb5,Q.d5,Q.bb5, Q.g5,Q.f5,Q.d5,Q.f5, Q.c5,Q.d5,Q.g5,Q.d5, Q.bb4,Q.c5,Q.d5,Q.g5],
+   pad:  [Q.g3,Q.bb3,Q.d4,Q.g4]},
 ];
 
 function initAudio(){
@@ -413,7 +429,7 @@ function sfxLaserOff(){
 const LOOKAHEAD=0.14,SCHED_MS=80;
 function scheduleBGM(){
   if(!bgmActive||!AC)return;
-  const bgm=BGM[Math.min(stage-1,4)];
+  const bgm=BGM[Math.min(stage-1,6)];
   const bpm=bgmBoss?bgm.bpm*1.3:bgm.bpm;
   const sd=60/bpm/2; // 8th-note duration
   const kv=bgmBoss?0.62:0.48, sv=bgmBoss?0.38:0.27, hv=bgmBoss?0.13:0.09;
@@ -464,6 +480,8 @@ const STAGES=[
   {name:'量子漩渦',bossName:'量子破壞者',color:'#dd00ff',bg:'#120015',bHp:620,eHp:4,eSpd:2.5,spawnR:42},
   {name:'火焰軌道',bossName:'熾焰邪王',  color:'#ff7700',bg:'#150600',bHp:850,eHp:5,eSpd:3.0,spawnR:33},
   {name:'深淵核心',bossName:'虛空主宰',  color:'#ff0055',bg:'#0e0005',bHp:1200,eHp:6,eSpd:3.5,spawnR:26},
+  {name:'星雲裂縫',bossName:'銀河獵手',  color:'#00ffcc',bg:'#001018',bHp:1650,eHp:7,eSpd:4.0,spawnR:20},
+  {name:'時空終點',bossName:'混沌神降',  color:'#ff00aa',bg:'#0a0010',bHp:2300,eHp:9,eSpd:4.8,spawnR:14},
 ];
 const KILL_GOAL=28;
 
@@ -525,7 +543,7 @@ const STORY_DATA=[
     '這是最後的考驗之一，風刃。',
     '用你的意志，穿越這片烈火！',
   ]},
-  {title:'最終決戰　深淵核心',color:'#ff0055',lines:[
+  {title:'第五關　深淵核心',color:'#ff0055',lines:[
     '熾焰邪王已倒下。帝國大廈將傾。',
     '',
     '你已站在帝國的心臟——深淵核心。',
@@ -535,10 +553,34 @@ const STORY_DATA=[
     '消滅虛空主宰，則帝國指揮鏈徹底崩潰，',
     '侵略行動將永遠終止。',
     '',
-    '為了倒下的戰友，',
-    '為了被摧毀的家園，為了未來的和平——',
+    '風刃，突破深淵！勝利就在眼前！',
+  ]},
+  {title:'第六關　星雲裂縫',color:'#00ffcc',lines:[
+    '虛空主宰雖已消滅，帝國卻啟動了末日計畫。',
+    '神秘的星雲裂縫已經開啟，',
+    '從裂縫中湧出了帝國最強戰力——「銀河獵手」。',
     '',
-    '風刃，讓我們終結這一切！',
+    '銀河獵手是帝國的終極殺手，',
+    '曾獨自摧毀三個星系的防衛艦隊。',
+    '',
+    '異常能量將干擾所有武器系統，',
+    '你必須突破重重阻礙，',
+    '',
+    '風刃，這場戰鬥比你想象中更危險！',
+  ]},
+  {title:'最終審判　時空終點',color:'#ff00aa',lines:[
+    '銀河獵手已被擊倒，整個星雲瀕臨崩潰。',
+    '',
+    '從崩潰的時空裂縫中，',
+    '一股超越物理法則的存在顯現——「混沌神降」。',
+    '',
+    '牠不是帝國的兵器——牠是宇宙本身的末日審判。',
+    '時空在牠的存在下扭曲、撕裂、崩解。',
+    '',
+    '風刃，超越極限，終結這場宇宙浩劫——',
+    '這是最後的戰場，人類命運的最後一戰！',
+    '',
+    '你已超越了所有界限。現在，超越時空本身！',
   ]},
 ];
 let storyIndex=0,storyChar=0,storyNextStage=1;
@@ -559,8 +601,10 @@ const SHIPS=[
 
 // ── WEAPON SYSTEM ─────────────────────────────────
 const WEAPON={type:'normal',level:1,laserTick:0};
-const SHOTGUN_CFG=[[3,18],[5,22],[7,28],[9,33],[11,38]];
-const LASER_CFG=  [[5,1,8],[8,1,7],[13,2,6],[18,2,5],[25,3,4]];
+const SHOTGUN_CFG= [[3,18],[5,22],[7,28],[9,33],[11,38]];
+const LASER_CFG=   [[5,1,8],[8,1,7],[13,2,6],[18,2,5],[25,3,4]];
+const MISSILE_CFG= [[1,7],[2,7],[2,8],[3,8],[3,9]];
+const WAVE_CFG=    [[3,14],[5,14],[7,14],[9,15],[11,15]];
 
 // ── SP / ULTIMATE SYSTEM ──────────────────────────
 const SP={
@@ -626,8 +670,10 @@ function spark(x,y,color,n=10){
     particles.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,r:1.2,life:1,decay:rand(0.05,0.1),color,line:true});}
 }
 function weaponColor(){
-  if(WEAPON.type==='shotgun')return'#ffaa00';
-  if(WEAPON.type==='laser')  return'#00ffff';
+  if(WEAPON.type==='shotgun') return'#ffaa00';
+  if(WEAPON.type==='laser')   return'#00ffff';
+  if(WEAPON.type==='missile') return'#ff6600';
+  if(WEAPON.type==='wave')    return'#00ffaa';
   return cfg().color;
 }
 
@@ -637,6 +683,8 @@ function weaponColor(){
 function puColors(wtype){
   if(wtype==='shotgun') return{col:'#ffaa00',col2:'#ff6600',label:'散彈',shape:'diamond'};
   if(wtype==='laser')   return{col:'#00ffff',col2:'#0055ff',label:'雷射',shape:'diamond'};
+  if(wtype==='missile') return{col:'#ff6600',col2:'#aa2200',label:'飛彈',shape:'diamond'};
+  if(wtype==='wave')    return{col:'#00ffaa',col2:'#006644',label:'波動',shape:'diamond'};
   if(wtype==='shield')  return{col:'#44ddff',col2:'#0055cc',label:'防護罩',shape:'hex'};
   if(wtype==='heal') return{col:'#ff4488',col2:'#aa0033',label:'加血',shape:'cross'};
   return{col:'#aaff44',col2:'#006600',label:'加速',shape:'tri'};
@@ -923,7 +971,7 @@ function drawEnemy(e){
     const t=Date.now()/300;
     ctx.beginPath();ctx.arc(0,0,28+Math.sin(t)*4,0,Math.PI*2);
     const gg=ctx.createRadialGradient(0,0,8,0,0,30);
-    const gc=e.gemType==='shotgun'?'#ffaa00':'#00ffff';
+    const gc=puColors(e.gemType).col;
     gg.addColorStop(0,gc+'44');gg.addColorStop(1,'transparent');ctx.fillStyle=gg;ctx.fill();
     ctx.save();ctx.rotate(t*2);ctx.beginPath();ctx.arc(22,0,4,0,Math.PI*2);
     ctx.fillStyle=gc;ctx.shadowColor=gc;ctx.shadowBlur=10;ctx.fill();
@@ -952,7 +1000,7 @@ function drawEnemy(e){
   }
   if(e.maxHp>1){const bw=e.elite?36:28;
     ctx.fillStyle='#333';ctx.fillRect(-bw/2,-28,bw,3);
-    ctx.fillStyle=e.elite?(e.gemType==='shotgun'?'#ffaa00':'#00ffff'):e.col;
+    ctx.fillStyle=e.elite?puColors(e.gemType).col:e.col;
     ctx.fillRect(-bw/2,-28,bw*(e.hp/e.maxHp),3);}
   ctx.shadowBlur=0;ctx.restore();
 }
@@ -1032,6 +1080,32 @@ function drawBullet(b,enemy){
       eg.addColorStop(0,'#fff');eg.addColorStop(0.45,b.col);eg.addColorStop(1,b.col+'22');
       ctx.fillStyle=eg;ctx.beginPath();ctx.arc(b.x,b.y,r,0,Math.PI*2);ctx.fill();
     }
+  } else if(b.missile){
+    const ang=Math.atan2(b.vy,b.vx)+Math.PI/2;
+    ctx.translate(b.x,b.y);ctx.rotate(ang);
+    // Exhaust flame
+    const fg=ctx.createRadialGradient(0,14,0,0,14,10);
+    fg.addColorStop(0,'#ffee00cc');fg.addColorStop(0.5,b.col+'88');fg.addColorStop(1,'transparent');
+    ctx.fillStyle=fg;ctx.beginPath();ctx.ellipse(0,14,5,9,0,0,Math.PI*2);ctx.fill();
+    // Body
+    const mg=ctx.createLinearGradient(0,8,0,-18);mg.addColorStop(0,b.col);mg.addColorStop(0.6,'#ffcc66');mg.addColorStop(1,'#ffffff');
+    ctx.fillStyle=mg;ctx.shadowBlur=18;
+    ctx.beginPath();ctx.moveTo(0,-18);ctx.lineTo(5,0);ctx.lineTo(4,8);ctx.lineTo(-4,8);ctx.lineTo(-5,0);ctx.closePath();ctx.fill();
+    // Fins
+    ctx.fillStyle=b.col+'cc';ctx.shadowBlur=6;
+    ctx.beginPath();ctx.moveTo(-4,4);ctx.lineTo(-11,12);ctx.lineTo(-4,12);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.moveTo(4,4);ctx.lineTo(11,12);ctx.lineTo(4,12);ctx.closePath();ctx.fill();
+    // Warhead tip
+    ctx.fillStyle='#fff';ctx.shadowBlur=12;ctx.beginPath();ctx.arc(0,-18,2.8,0,Math.PI*2);ctx.fill();
+  } else if(b.wt!==undefined){
+    ctx.translate(b.x,b.y);
+    const r=4+Math.sin(b.wt*0.3)*1.5;
+    // Outer glow
+    const wg=ctx.createRadialGradient(0,0,0,0,0,r+6);
+    wg.addColorStop(0,'#ffffff');wg.addColorStop(0.35,b.col);wg.addColorStop(0.7,b.col+'66');wg.addColorStop(1,'transparent');
+    ctx.fillStyle=wg;ctx.shadowBlur=14;ctx.beginPath();ctx.arc(0,0,r+6,0,Math.PI*2);ctx.fill();
+    // Bright core
+    ctx.fillStyle='#fff';ctx.shadowBlur=8;ctx.beginPath();ctx.arc(0,0,r*0.45,0,Math.PI*2);ctx.fill();
   } else {
     const ang=Math.atan2(b.vy,b.vx)+Math.PI/2;
     ctx.translate(b.x,b.y);ctx.rotate(ang);
@@ -1246,14 +1320,15 @@ function drawHUD(){
 
 function drawWeaponHUD(){
   const wt=WEAPON.type,lv=WEAPON.level;if(wt==='normal')return;
-  const isSh=wt==='shotgun',col=isSh?'#ffaa00':'#00ffff';
+  const col=wt==='shotgun'?'#ffaa00':wt==='missile'?'#ff6600':wt==='wave'?'#00ffaa':'#00ffff';
+  const label=wt==='shotgun'?'散彈':wt==='missile'?'飛彈':wt==='wave'?'波動':'雷射';
   const wx=W/2,wy=H-68;
   ctx.save();
   ctx.beginPath();ctx.roundRect(wx-52,wy-14,104,20,10);
   ctx.fillStyle='rgba(0,0,0,0.55)';ctx.fill();ctx.strokeStyle=col+'88';ctx.lineWidth=1;ctx.stroke();
   ctx.save();ctx.translate(wx-38,wy-4);ctx.rotate(Math.PI/4);ctx.fillStyle=col;ctx.shadowColor=col;ctx.shadowBlur=8;ctx.fillRect(-5,-5,10,10);ctx.shadowBlur=0;ctx.restore();
   ctx.fillStyle=col;ctx.shadowColor=col;ctx.shadowBlur=6;ctx.font='bold 11px Courier New';ctx.textAlign='left';
-  ctx.fillText(isSh?'散彈':'雷射',wx-24,wy+1);ctx.shadowBlur=0;
+  ctx.fillText(label,wx-24,wy+1);ctx.shadowBlur=0;
   for(let i=0;i<5;i++){const px2=wx+18+i*12,py2=wy-3;
     ctx.beginPath();ctx.arc(px2,py2,4,0,Math.PI*2);
     if(i<lv){ctx.fillStyle=col;ctx.shadowColor=col;ctx.shadowBlur=8;ctx.fill();ctx.shadowBlur=0;}
@@ -1285,7 +1360,9 @@ function spawnEnemy(){
   const fromSide=pat==='side',left=Math.random()<0.5;
   const elite=Math.random()<0.30;
   const gemRoll=Math.random();
-  const gemType=gemRoll<0.24?'shotgun':gemRoll<0.48?'laser':gemRoll<0.66?'shield':gemRoll<0.84?'speed':'heal';
+  const gemType=stage>=5
+    ?(gemRoll<0.18?'shotgun':gemRoll<0.36?'laser':gemRoll<0.52?'missile':gemRoll<0.64?'wave':gemRoll<0.76?'shield':gemRoll<0.88?'speed':'heal')
+    :(gemRoll<0.24?'shotgun':gemRoll<0.48?'laser':gemRoll<0.66?'shield':gemRoll<0.84?'speed':'heal');
   const eHp=Math.max(1,Math.ceil(c.eHp*T.hp*(elite?1.8:1)));
   enemies.push({
     x:fromSide?(left?-22:W+22):rand(30,W-30),y:fromSide?rand(50,H*0.5):-28,
@@ -1356,7 +1433,8 @@ function updatePlayer(){
   const curSpd=P.spd*(BUFF.speed>0?SPEED_MULT:1);
   P.x=Math.max(24,Math.min(W-24,P.x+dx*curSpd));P.y=Math.max(48,Math.min(H-130,P.y+dy*curSpd));
   P.blade+=0.09;if(P.inv>0)P.inv--;
-  if(WEAPON.type!=='laser'){P.sTimer++;if(P.sTimer>=P.sRate){P.sTimer=0;firePlayer();}}
+  const wSRate=WEAPON.type==='missile'?28:P.sRate;
+  if(WEAPON.type!=='laser'){P.sTimer++;if(P.sTimer>=wSRate){P.sTimer=0;firePlayer();}}
 }
 
 function firePlayer(){
@@ -1367,10 +1445,22 @@ function firePlayer(){
     for(let i=0;i<cnt;i++){const t=cnt===1?0:(i/(cnt-1))*2-1,ang=base+t*halfRad;
       pBullets.push({x:P.x,y:P.y-18,vx:Math.cos(ang)*12.5,vy:Math.sin(ang)*12.5,col:c});}
     sfxShotgun();
+  } else if(WEAPON.type==='missile'){
+    const[cnt,spd]=MISSILE_CFG[WEAPON.level-1];
+    for(let i=0;i<cnt;i++){
+      const ox=(cnt===1?0:(i-(cnt-1)/2)*16);
+      pBullets.push({x:P.x+ox,y:P.y-22,vx:ox*0.06,vy:-spd,col:c,missile:true,dmg:3});}
+    sfxShotgun();
+  } else if(WEAPON.type==='wave'){
+    const[cnt,spd]=WAVE_CFG[WEAPON.level-1];
+    for(let i=0;i<cnt;i++){
+      const t=cnt===1?0:(i/(cnt-1))*2-1;
+      pBullets.push({x:P.x,y:P.y-18,vx:t*(spd*0.45),vy:-spd*0.92,col:c,wt:i*5,wamp:2.8});}
+    sfxShoot();
   } else {
     pBullets.push({x:P.x,y:P.y-22,vx:0,vy:-13,col:c});
     if(stage>=3){pBullets.push({x:P.x-14,y:P.y-12,vx:-0.8,vy:-12,col:c});pBullets.push({x:P.x+14,y:P.y-12,vx:0.8,vy:-12,col:c});}
-    if(stage>=5||loop>=2){pBullets.push({x:P.x-7,y:P.y-22,vx:-2,vy:-12,col:c+'bb'});pBullets.push({x:P.x+7,y:P.y-22,vx:2,vy:-12,col:c+'bb'});}
+    if(stage>=7||loop>=2){pBullets.push({x:P.x-7,y:P.y-22,vx:-2,vy:-12,col:c+'bb'});pBullets.push({x:P.x+7,y:P.y-22,vx:2,vy:-12,col:c+'bb'});}
     sfxShoot();
   }
 }
@@ -1439,12 +1529,24 @@ function updateBoss(){
 function updatePBullets(){
   if(WEAPON.type==='laser')return;
   pBullets=pBullets.filter(b=>{
+    // Homing missile steering
+    if(b.missile){
+      let tx=P.x,ty=-100,best=Infinity;
+      for(const e of enemies){const d=Math.hypot(e.x-b.x,e.y-b.y);if(d<best&&e.y<b.y+60){best=d;tx=e.x;ty=e.y;}}
+      if(boss){const bd=Math.hypot(boss.x-b.x,boss.y-b.y);if(bd<best){tx=boss.x;ty=boss.y;}}
+      if(ty<0){tx=P.x;ty=-200;}
+      const ba=Math.atan2(ty-b.y,tx-b.x),ca=Math.atan2(b.vy,b.vx),sp=Math.hypot(b.vx,b.vy);
+      let da=ba-ca;if(da>Math.PI)da-=Math.PI*2;if(da<-Math.PI)da+=Math.PI*2;
+      const na=ca+Math.max(-0.1,Math.min(0.1,da));b.vx=Math.cos(na)*sp;b.vy=Math.sin(na)*sp;
+    }
+    // Wave oscillation
+    if(b.wt!==undefined){b.vx=Math.sin(b.wt*0.2)*b.wamp;b.wt++;}
     b.x+=b.vx;b.y+=b.vy;if(b.y<-20||b.x<-20||b.x>W+20)return false;
     let hit=false;
     for(let i=enemies.length-1;i>=0;i--){
-      const e=enemies[i];const hr=WEAPON.type==='shotgun'?18:22;
+      const e=enemies[i];const hr=b.missile?28:WEAPON.type==='shotgun'?18:22;
       if(Math.hypot(b.x-e.x,b.y-e.y)<hr){
-        hit=true;e.hp--;burst(e.x,e.y,e.col,4,2);
+        hit=true;e.hp-=(b.dmg||1);burst(e.x,e.y,e.col,b.missile?8:4,b.missile?3:2);
         if(e.hp<=0){
           if(e.elite){burst(e.x,e.y,e.col,18,5);spark(e.x,e.y,e.col,14);ringBurst(e.x,e.y,e.col,10,5);}
           else{burst(e.x,e.y,e.col,12,4);}
@@ -1452,11 +1554,11 @@ function updatePBullets(){
           if(e.elite){dropGem(e.x,e.y,e.gemType);sfxKillEnemy(true);gainSP(SP_GAIN.elite);}
           else{sfxKillEnemy(false);gainSP(SP_GAIN.normal);}
           enemies.splice(i,1);}
-        if(WEAPON.type!=='shotgun'||WEAPON.level<3)break;
+        if(b.missile||WEAPON.type!=='shotgun'||WEAPON.level<3)break;
       }
     }
     if(!hit&&boss&&Math.hypot(b.x-boss.x,b.y-boss.y)<58){
-      hit=true;boss.hp--;score+=5*stage*loop;gainSP(SP_GAIN.boss);
+      hit=true;boss.hp-=(b.dmg||1);score+=5*(b.dmg||1)*stage*loop;gainSP(SP_GAIN.boss);
       if(Math.random()<0.25)burst(boss.x+rand(-30,30),boss.y+rand(-30,30),boss.col,3,2);
       if(boss.hp<=0){ringBurst(boss.x,boss.y,boss.col,24,6);burst(boss.x,boss.y,'#fff',20,5);
         score+=600*stage*loop;gainSP(SP_GAIN.bossKill);boss=null;sfxBossDie();startClear();}
@@ -1635,7 +1737,7 @@ function advanceVictory(){
   gState='MENU';
 }
 function nextStage(){
-  if(stage>=5){
+  if(stage>=7){
     if(loop===1){showVictory();return;}
     stage=1;loop++;
   }else{
@@ -1755,12 +1857,12 @@ function renderMenu(){
   ctx.fillText('電腦：WASD / 方向鍵移動',W/2,H/2-34-16);
   ctx.fillText('自動射擊，消滅 28 隻小怪 → 召喚 BOSS',W/2,H/2-34);
   ctx.fillStyle='#ffaa00';ctx.font='bold 11px Courier New';ctx.shadowColor='#ffaa00';ctx.shadowBlur=6;
-  ctx.fillText('◆ 散彈寶物',W/2-54,H/2-10);ctx.shadowBlur=0;
-  ctx.fillStyle='#aaa';ctx.font='11px Courier New';ctx.fillText('子彈擴散，Lv3+可穿透，最高Lv5',W/2+20,H/2-10);
-  ctx.fillStyle='#00ffff';ctx.font='bold 11px Courier New';ctx.shadowColor='#00ffff';ctx.shadowBlur=6;
-  ctx.fillText('◆ 雷射寶物',W/2-54,H/2+8);ctx.shadowBlur=0;
-  ctx.fillStyle='#aaa';ctx.font='11px Courier New';ctx.fillText('持續光束，Lv愈高愈寬愈強，最高Lv5',W/2+20,H/2+8);
-  ctx.fillStyle='#fff';ctx.font='11px Courier New';ctx.fillText('同類寶物=升級  不同類=切換武器',W/2,H/2+26);
+  ctx.fillText('◆ 散彈/雷射',W/2-54,H/2-10);ctx.shadowBlur=0;
+  ctx.fillStyle='#aaa';ctx.font='11px Courier New';ctx.fillText('散彈：擴散穿透  雷射：寬束持續',W/2+20,H/2-10);
+  ctx.fillStyle='#ff6600';ctx.font='bold 11px Courier New';ctx.shadowColor='#ff6600';ctx.shadowBlur=6;
+  ctx.fillText('◆ 飛彈/波動',W/2-54,H/2+8);ctx.shadowBlur=0;
+  ctx.fillStyle='#aaa';ctx.font='11px Courier New';ctx.fillText('飛彈：追蹤高傷  波動：波浪群射',W/2+20,H/2+8);
+  ctx.fillStyle='#888';ctx.font='11px Courier New';ctx.fillText('同類寶物=升級  不同類=切換  ★5關後新武出現',W/2,H/2+26);
   ctx.fillStyle=SHIELD_COL;ctx.font='bold 11px Courier New';ctx.shadowColor=SHIELD_COL;ctx.shadowBlur=6;
   ctx.fillText('🛡 防護罩',W/2-54,H/2+44);ctx.shadowBlur=0;
   ctx.fillStyle='#aaa';ctx.font='11px Courier New';ctx.fillText('吃到後產生護盾，8秒無敵抵擋一切攻擊',W/2+16,H/2+44);
@@ -1774,7 +1876,7 @@ function renderMenu(){
   ctx.fillText('⚡ SP大絕招',W/2-54,H/2+76);ctx.shadowBlur=0;
   ctx.fillStyle='#aaa';ctx.font='11px Courier New';ctx.fillText('殺敵累積SP → 電腦按X鍵 / 手機按大絕按鈕',W/2+16,H/2+44);
   ctx.fillText('全屏量子風暴：瞬間重創所有敵機＋消除子彈！',W/2,H/2+60);
-  ctx.fillStyle='#888';ctx.font='10px Courier New';ctx.fillText('★ 10滴血 × 5關 × ∞循環加難 ★',W/2,H/2+78);
+  ctx.fillStyle='#888';ctx.font='10px Courier New';ctx.fillText('★ 10滴血 × 7關 × ∞循環加難 ★',W/2,H/2+78);
   const blink=Math.floor(Date.now()/550)%2;
   ctx.fillStyle=blink?'#00e5ff':'#004466';ctx.font='bold 18px Courier New';
   ctx.shadowColor='#00e5ff';ctx.shadowBlur=blink?20:0;ctx.fillText('[ 點擊 / 按鍵 開始 ]',W/2,H/2+135);ctx.shadowBlur=0;
@@ -1799,7 +1901,7 @@ function renderMenu(){
   ctx.fillStyle='rgba(0,229,255,0.55)';ctx.font='9px Courier New';ctx.textAlign='center';
   ctx.fillText('搖桿',jx,jy+4);ctx.fillText('(觸碰)',jx,H-24);
   ctx.fillStyle='#2a2a2a';ctx.font='10px Courier New';
-  ctx.fillText('1霓虹峽谷│2電磁風暴│3量子漩渦│4火焰軌道│5深淵核心',W/2,H-8);
+  ctx.fillText('1霓虹│2電磁│3量子│4火焰│5深淵│6星雲│7時空',W/2,H-8);
 }
 
 function renderClear(){
@@ -1810,13 +1912,13 @@ function renderClear(){
   ctx.font='18px Courier New';ctx.fillText(`第${stage}關「${pc.name}」完成`,W/2,H/2-50);
   ctx.fillText(`擊倒BOSS: ${pc.bossName}`,W/2,H/2-20);
   ctx.shadowBlur=0;ctx.fillStyle='#fff';ctx.font='15px Courier New';ctx.fillText(`SCORE: ${score}`,W/2,H/2+20);
-  if(stage===5){ctx.fillStyle='#ffdd00';ctx.shadowColor='#ffdd00';ctx.shadowBlur=20;ctx.font='bold 16px Courier New';
-    if(loop===1){ctx.fillText('★ 五關全通！帝國已覆滅！★',W/2,H/2+60);ctx.fillText('即將進入結局...',W/2,H/2+84);}
-    else{ctx.fillText(`★ 五關全通！第${loop+1}循環開始 ★`,W/2,H/2+60);ctx.fillText(`難度提升${Math.round((1+loop*0.28)*100-100)}%！`,W/2,H/2+84);}
+  if(stage===7){ctx.fillStyle='#ffdd00';ctx.shadowColor='#ffdd00';ctx.shadowBlur=20;ctx.font='bold 16px Courier New';
+    if(loop===1){ctx.fillText('★ 七關全通！帝國已覆滅！★',W/2,H/2+60);ctx.fillText('即將進入結局...',W/2,H/2+84);}
+    else{ctx.fillText(`★ 七關全通！第${loop+1}循環開始 ★`,W/2,H/2+60);ctx.fillText(`難度提升${Math.round((1+loop*0.28)*100-100)}%！`,W/2,H/2+84);}
     ctx.shadowBlur=0;}
   const prog=clearTimer/200;ctx.fillStyle='#222';ctx.fillRect(W/2-80,H/2+115,160,6);
   ctx.fillStyle=pc.color;ctx.fillRect(W/2-80,H/2+115,160*prog,6);
-  ctx.fillStyle='#888';ctx.font='11px Courier New';ctx.fillText('下一關即將開始...',W/2,H/2+140);
+  ctx.fillStyle='#888';ctx.font='11px Courier New';ctx.fillText(stage===7&&loop===1?'即將進入結局...':'下一關即將開始...',W/2,H/2+140);
 }
 
 function renderShipSelect(){
@@ -1876,7 +1978,7 @@ function renderShipSelect(){
     ctx.fillText(ship.hint,cx,cardY+210+(sel?-6:0));
 
     // Weapon badge
-    const wlabels={normal:'標準砲',shotgun:'散彈砲',laser:'雷射砲'};
+    const wlabels={normal:'標準砲',shotgun:'散彈砲',laser:'雷射砲',missile:'飛彈砲',wave:'波動砲'};
     const wbg=sel?ship.col+'33':'rgba(0,0,0,0.4)';
     ctx.fillStyle=wbg;ctx.beginPath();ctx.roundRect(cardX+8,cardY+222+(sel?-6:0),cardW-16,18,5);ctx.fill();
     ctx.strokeStyle=sel?ship.col:ship.col+'44';ctx.lineWidth=1;ctx.stroke();
@@ -2052,8 +2154,8 @@ function renderVictory(){
     const a=Math.min(1,(victoryTimer-70)/50);
     ctx.globalAlpha=a;
     const vlines=[
-      '虛空主宰已被摧毀。',
-      '鐵幕帝國的指揮鏈徹底崩潰，',
+      '混沌神降已被粉碎，時空重新趨於穩定。',
+      '鐵幕帝國七路防線盡數崩潰，',
       '入侵艦隊紛紛撤退，聯邦疆域得以光復。',
       '',
       '銀河聯邦的天空，再次回歸平靜。',
@@ -2061,7 +2163,7 @@ function renderVictory(){
       '仰望著那道劃過長空的光芒。',
       '',
       '那是你，風刃。',
-      '孤身對抗帝國，守護了家園。',
+      '孤身對抗帝國，守護了宇宙的秩序。',
     ];
     ctx.font='13px Courier New';ctx.textAlign='left';
     vlines.forEach((l,i)=>{
