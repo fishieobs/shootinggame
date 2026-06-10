@@ -1558,6 +1558,9 @@ function lbLoad(){try{return JSON.parse(localStorage.getItem(LB_KEY)||'[]');}cat
 function lbSave(e){let lb=lbLoad();lb.push(e);lb.sort((a,b)=>b.score-a.score);lb=lb.slice(0,8);try{localStorage.setItem(LB_KEY,JSON.stringify(lb));}catch(ex){}return lb;}
 function lbClear(){try{localStorage.removeItem(LB_KEY);}catch(e){}}
 
+// Restore hiscore from localStorage on startup
+{const _lb=lbLoad();if(_lb.length&&_lb[0].score>hiscore)hiscore=_lb[0].score;}
+
 let gameoverTimer=0,lbEntries=[],selectedShip=0,shipAngle=0;
 
 function gameOver(){
@@ -1674,8 +1677,20 @@ function renderMenu(){
   const blink=Math.floor(Date.now()/550)%2;
   ctx.fillStyle=blink?'#00e5ff':'#004466';ctx.font='bold 18px Courier New';
   ctx.shadowColor='#00e5ff';ctx.shadowBlur=blink?20:0;ctx.fillText('[ 點擊 / 按鍵 開始 ]',W/2,H/2+135);ctx.shadowBlur=0;
-  if(hiscore>0){ctx.fillStyle='#ffdd00';ctx.font='12px Courier New';ctx.shadowColor='#ffdd00';ctx.shadowBlur=8;
-    ctx.fillText('★ 最高分: '+hiscore+' ★',W/2,H/2+138);ctx.shadowBlur=0;}
+  // Mini leaderboard on menu
+  const _lb=lbLoad();
+  if(_lb.length){
+    const lbY=H/2+138;
+    ctx.fillStyle='rgba(0,0,15,0.7)';ctx.beginPath();ctx.roundRect(W/2-130,lbY-14,260,16+_lb.slice(0,3).length*16,6);ctx.fill();
+    ctx.strokeStyle='#00e5ff33';ctx.lineWidth=1;ctx.stroke();
+    ctx.shadowColor='#ffdd00';ctx.shadowBlur=6;ctx.fillStyle='#ffdd00';ctx.font='bold 10px Courier New';
+    ctx.fillText('🏅 排行榜',W/2,lbY);ctx.shadowBlur=0;
+    const rc=['#ffd700','#c0c0c0','#cd7f32'];
+    _lb.slice(0,3).forEach((e,i)=>{
+      ctx.fillStyle=rc[i];ctx.font='10px Courier New';
+      ctx.fillText((i===0?'🥇':i===1?'🥈':'🥉')+' '+e.score.toLocaleString()+'  S'+e.stage+'L'+e.loop,W/2,lbY+14+i*16);
+    });
+  }
   const jx=90,jy=H-90;
   ctx.beginPath();ctx.arc(jx,jy,60,0,Math.PI*2);ctx.strokeStyle='rgba(0,229,255,0.18)';ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.stroke();ctx.setLineDash([]);
   ctx.fillStyle='rgba(0,229,255,0.08)';ctx.fill();ctx.beginPath();ctx.arc(jx,jy,26,0,Math.PI*2);
