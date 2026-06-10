@@ -1177,19 +1177,33 @@ function drawWeaponHUD(){
 // ═══════════════════════════════════════════════════
 //  SPAWN
 // ═══════════════════════════════════════════════════
+// Per-type enemy traits: hp/speed/fire-rate multipliers
+// type 0 十字旋翼=均衡  1 飛鏢=快而脆  2 重甲三角=慢坦克  3 六角砲手=連射  4 三刃獵手=快速獵殺
+const ETYPE=[
+  {hp:1.0,spd:1.0, fr:1.0},
+  {hp:0.6,spd:1.45,fr:1.15},
+  {hp:1.8,spd:0.7, fr:1.2},
+  {hp:1.0,spd:0.85,fr:0.6},
+  {hp:0.8,spd:1.25,fr:1.0},
+];
 function spawnEnemy(){
-  const c=cfg(),type=stage-1,col=c.color;
+  const c=cfg(),col=c.color;
+  // Mixed types per stage: pool grows with stage (S1: 2 types … S4+: all 5)
+  const pool=Math.min(5,stage+1);
+  const type=Math.floor(Math.random()*pool);
+  const T=ETYPE[type];
   let pat='straight';const r=Math.random();
   if(stage>=2&&r<0.3)pat='zigzag';if(stage>=3&&r<0.2)pat='swoop';if(stage>=4&&r<0.15)pat='side';if(stage>=3&&r<0.1)pat='dive';
+  if(type===4&&stage>=3&&Math.random()<0.4)pat='dive'; // tri-blade hunter favors diving
   const fromSide=pat==='side',left=Math.random()<0.5;
   const elite=Math.random()<0.30;
   const gemRoll=Math.random();
   const gemType=gemRoll<0.24?'shotgun':gemRoll<0.48?'laser':gemRoll<0.66?'shield':gemRoll<0.84?'speed':'heal';
-  const eHp=elite?Math.ceil(c.eHp*1.8):c.eHp;
+  const eHp=Math.max(1,Math.ceil(c.eHp*T.hp*(elite?1.8:1)));
   enemies.push({
     x:fromSide?(left?-22:W+22):rand(30,W-30),y:fromSide?rand(50,H*0.5):-28,
-    hp:eHp,maxHp:eHp,spd:c.eSpd*(elite?0.8:1),type,col,pat,rot:0,timer:0,
-    stimer:0,srate:Math.max(38,130-stage*15-(loop-1)*8),dir:left?1:-1,elite,gemType});
+    hp:eHp,maxHp:eHp,spd:c.eSpd*T.spd*(elite?0.8:1),type,col,pat,rot:0,timer:0,
+    stimer:0,srate:Math.max(24,Math.floor((130-stage*15-(loop-1)*8)*T.fr)),dir:left?1:-1,elite,gemType});
 }
 function dropGem(x,y,wtype){powerups.push({x,y,vy:1.4,wtype,life:380});}
 
