@@ -918,6 +918,167 @@ function drawEnemy(e){
   ctx.shadowBlur=0;ctx.restore();
 }
 
+// ── PER-BOSS BODY DESIGNS (drawn at boss origin) ──
+function drawBossGhost(b,t){// S1 — stealth raider with ghostly flicker
+  const fl=0.82+Math.sin(t*7)*0.18;
+  ctx.save();ctx.globalAlpha=fl;
+  // Swept-wing stealth hull
+  ctx.beginPath();
+  ctx.moveTo(0,38);ctx.lineTo(58,-8);ctx.lineTo(30,-16);ctx.lineTo(12,-40);ctx.lineTo(-12,-40);ctx.lineTo(-30,-16);ctx.lineTo(-58,-8);ctx.closePath();
+  const g=ctx.createLinearGradient(0,-40,0,38);g.addColorStop(0,'#0a1428');g.addColorStop(0.6,'#04101e');g.addColorStop(1,b.col+'33');
+  ctx.fillStyle=g;ctx.fill();ctx.strokeStyle=b.col;ctx.lineWidth=2;ctx.stroke();
+  // Twin tail fins
+  for(const sx of[-1,1]){ctx.beginPath();
+    ctx.moveTo(sx*14,-34);ctx.lineTo(sx*22,-52);ctx.lineTo(sx*26,-30);ctx.closePath();
+    ctx.fillStyle=b.col+'66';ctx.fill();ctx.strokeStyle=b.col;ctx.lineWidth=1.2;ctx.stroke();}
+  // Wingtip lights
+  for(const sx of[-1,1]){ctx.beginPath();ctx.arc(sx*50,-8,3,0,Math.PI*2);
+    ctx.fillStyle=b.col;ctx.shadowColor=b.col;ctx.shadowBlur=12;ctx.fill();ctx.shadowBlur=0;}
+  // Ghost afterimage outline
+  ctx.globalAlpha=0.18*fl;ctx.strokeStyle=b.col;ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(0,46);ctx.lineTo(66,-10);ctx.lineTo(14,-46);ctx.lineTo(-14,-46);ctx.lineTo(-66,-10);ctx.closePath();ctx.stroke();
+  ctx.restore();
+}
+function drawBossWhale(b,t){// S2 — mechanical whale with crackling arcs
+  ctx.save();ctx.rotate(Math.sin(t*2.2)*0.06);
+  // Oscillating tail fluke
+  ctx.save();ctx.translate(58,0);ctx.rotate(Math.sin(t*4)*0.5);
+  ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(26,-18);ctx.lineTo(20,0);ctx.lineTo(26,18);ctx.closePath();
+  ctx.fillStyle=b.col+'88';ctx.fill();ctx.strokeStyle=b.col;ctx.lineWidth=1.5;ctx.stroke();ctx.restore();
+  // Body
+  ctx.beginPath();ctx.ellipse(0,0,56,30,0,0,Math.PI*2);
+  const g=ctx.createLinearGradient(0,-30,0,30);g.addColorStop(0,'#06301c');g.addColorStop(0.5,'#031408');g.addColorStop(1,b.col+'22');
+  ctx.fillStyle=g;ctx.fill();ctx.strokeStyle=b.col;ctx.lineWidth=2.5;ctx.stroke();
+  // Dorsal fin
+  ctx.beginPath();ctx.moveTo(-6,-28);ctx.lineTo(6,-48);ctx.lineTo(18,-26);ctx.closePath();
+  ctx.fillStyle=b.col+'77';ctx.fill();ctx.strokeStyle=b.col;ctx.lineWidth=1.5;ctx.stroke();
+  // Belly grooves
+  ctx.strokeStyle=b.col+'55';ctx.lineWidth=1;
+  for(let i=0;i<4;i++){ctx.beginPath();ctx.moveTo(-44+i*6,10+i*4);ctx.lineTo(30-i*4,12+i*4);ctx.stroke();}
+  // Electric arcs
+  ctx.strokeStyle='#aaffdd';ctx.shadowColor='#aaffdd';ctx.shadowBlur=10;ctx.lineWidth=1.3;
+  ctx.globalAlpha=0.5+Math.sin(t*9)*0.4;
+  for(let i=0;i<3;i++){const a=t*3+i*2.1;
+    let px=Math.cos(a)*62,py=Math.sin(a)*34;
+    ctx.beginPath();ctx.moveTo(px,py);
+    for(let j=0;j<3;j++){px+=rand(-14,14);py+=rand(-12,12);ctx.lineTo(px,py);}ctx.stroke();}
+  ctx.globalAlpha=1;ctx.shadowBlur=0;
+  // Eye
+  ctx.beginPath();ctx.arc(-34,-8,6,0,Math.PI*2);ctx.fillStyle='#fff';ctx.shadowColor='#fff';ctx.shadowBlur=10;ctx.fill();ctx.shadowBlur=0;
+  ctx.beginPath();ctx.arc(-35,-8,2.8,0,Math.PI*2);ctx.fillStyle='#021408';ctx.fill();
+  ctx.restore();
+}
+function drawBossQuantum(b,t){// S3 — glitching hexagram with orbiting satellites
+  // Glitch double-image then solid
+  for(const[ox,al]of[[Math.sin(t*13)*6,0.25],[0,1]]){
+    ctx.save();ctx.translate(ox,0);ctx.globalAlpha=al;ctx.rotate(b.rot*1.5);
+    for(const dir of[0,Math.PI]){
+      ctx.save();ctx.rotate(dir);
+      ctx.beginPath();for(let i=0;i<3;i++){const a=(Math.PI*2/3)*i-Math.PI/2;
+        i===0?ctx.moveTo(Math.cos(a)*52,Math.sin(a)*52):ctx.lineTo(Math.cos(a)*52,Math.sin(a)*52);}
+      ctx.closePath();
+      if(dir===0){ctx.fillStyle='rgba(13,0,20,0.8)';ctx.fill();}
+      ctx.strokeStyle=b.col;ctx.lineWidth=2;ctx.stroke();ctx.restore();}
+    ctx.restore();
+  }
+  // Orbiting satellites
+  for(let i=0;i<3;i++){const a=b.rot*3+(Math.PI*2/3)*i;
+    ctx.save();ctx.translate(Math.cos(a)*68,Math.sin(a)*68);ctx.rotate(b.rot*6);
+    ctx.beginPath();ctx.moveTo(0,-8);ctx.lineTo(7,0);ctx.lineTo(0,8);ctx.lineTo(-7,0);ctx.closePath();
+    ctx.fillStyle=b.col;ctx.shadowColor=b.col;ctx.shadowBlur=12;ctx.fill();ctx.shadowBlur=0;ctx.restore();}
+  // Dashed containment ring
+  ctx.save();ctx.rotate(-b.rot*2.5);ctx.beginPath();ctx.arc(0,0,28,0,Math.PI*2);
+  ctx.setLineDash([8,6]);ctx.strokeStyle=b.col+'99';ctx.lineWidth=2;ctx.stroke();ctx.setLineDash([]);ctx.restore();
+}
+function drawBossBlaze(b,t){// S4 — horned flame demon
+  // Animated flame tongues
+  ctx.save();ctx.rotate(b.rot*0.6);
+  for(let i=0;i<12;i++){const a=(Math.PI*2/12)*i,fr=48+Math.sin(t*7+i*1.7)*12;
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(a-0.16)*30,Math.sin(a-0.16)*30);
+    ctx.quadraticCurveTo(Math.cos(a)*(fr+14),Math.sin(a)*(fr+14),Math.cos(a+0.16)*30,Math.sin(a+0.16)*30);
+    const fg=ctx.createLinearGradient(Math.cos(a)*30,Math.sin(a)*30,Math.cos(a)*fr,Math.sin(a)*fr);
+    fg.addColorStop(0,'#ffdd55');fg.addColorStop(0.55,b.col);fg.addColorStop(1,'rgba(170,17,0,0.33)');
+    ctx.fillStyle=fg;ctx.shadowColor=b.col;ctx.shadowBlur=14;ctx.fill();ctx.shadowBlur=0;}
+  ctx.restore();
+  // Head disc
+  ctx.beginPath();ctx.arc(0,0,32,0,Math.PI*2);
+  const g=ctx.createRadialGradient(0,0,4,0,0,32);g.addColorStop(0,'#2a0800');g.addColorStop(0.7,'#160300');g.addColorStop(1,b.col+'44');
+  ctx.fillStyle=g;ctx.fill();ctx.strokeStyle=b.col;ctx.lineWidth=2.5;ctx.stroke();
+  // Horns
+  for(const sx of[-1,1]){ctx.beginPath();
+    ctx.moveTo(sx*16,-24);ctx.quadraticCurveTo(sx*34,-44,sx*22,-58);
+    ctx.quadraticCurveTo(sx*26,-40,sx*10,-28);ctx.closePath();
+    ctx.fillStyle=b.col;ctx.shadowColor=b.col;ctx.shadowBlur=10;ctx.fill();ctx.shadowBlur=0;}
+  // Angry slit eyes
+  for(const sx of[-1,1]){ctx.beginPath();
+    ctx.moveTo(sx*6,-8);ctx.lineTo(sx*20,-14);ctx.lineTo(sx*18,-4);ctx.closePath();
+    ctx.fillStyle='#ffee66';ctx.shadowColor='#ffee66';ctx.shadowBlur=12;ctx.fill();ctx.shadowBlur=0;}
+}
+function drawBossVoid(b,t){// S5 — spiked dark star (original design)
+  ctx.save();ctx.rotate(b.rot);
+  const spikes=b.phase>=2?14:10;
+  ctx.beginPath();
+  for(let i=0;i<spikes;i++){const a=(Math.PI*2/spikes)*i,r=i%2===0?57+Math.sin(t*5)*3:34;
+    i===0?ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r):ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);}
+  ctx.closePath();
+  const sbg=ctx.createRadialGradient(0,0,10,0,0,60);sbg.addColorStop(0,'#110010');sbg.addColorStop(0.5,'#06010e');sbg.addColorStop(1,b.col+'11');
+  ctx.fillStyle=sbg;ctx.fill();ctx.strokeStyle=b.col;ctx.lineWidth=2.5;ctx.stroke();
+  for(let i=0;i<spikes;i+=2){const a=(Math.PI*2/spikes)*i;
+    ctx.beginPath();ctx.arc(Math.cos(a)*57,Math.sin(a)*57,3,0,Math.PI*2);ctx.fillStyle=b.col;ctx.shadowBlur=10;ctx.fill();ctx.shadowBlur=0;}
+  ctx.restore();
+  ctx.save();ctx.rotate(-b.rot*2);ctx.beginPath();
+  for(let i=0;i<8;i++){const a=(Math.PI*2/8)*i,r=i%2===0?32:24;
+    i===0?ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r):ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);}
+  ctx.closePath();ctx.strokeStyle=b.col+'77';ctx.lineWidth=2;ctx.stroke();ctx.restore();
+}
+function drawBossHunter(b,t){// S6 — sleek predator with scythe wings & lock-on beam
+  ctx.save();
+  // Lock-on targeting beam toward player
+  const aim=Math.atan2(P.y-b.y,P.x-b.x);
+  ctx.save();ctx.rotate(aim);ctx.globalAlpha=0.14+Math.sin(t*10)*0.08;
+  ctx.fillStyle=b.col;ctx.fillRect(0,-1.5,400,3);ctx.restore();
+  // Scythe wings with claw tips
+  for(const sx of[-1,1]){
+    ctx.save();ctx.scale(sx,1);
+    ctx.beginPath();ctx.moveTo(10,-6);
+    ctx.quadraticCurveTo(58,-26,74,8);
+    ctx.quadraticCurveTo(52,2,34,16);
+    ctx.quadraticCurveTo(20,10,10,12);ctx.closePath();
+    const g=ctx.createLinearGradient(10,0,74,0);g.addColorStop(0,'#02201c');g.addColorStop(1,b.col+'66');
+    ctx.fillStyle=g;ctx.fill();ctx.strokeStyle=b.col;ctx.lineWidth=2;ctx.stroke();
+    ctx.beginPath();ctx.moveTo(74,8);ctx.quadraticCurveTo(84,18,72,30);ctx.quadraticCurveTo(72,18,64,14);ctx.closePath();
+    ctx.fillStyle=b.col;ctx.shadowColor=b.col;ctx.shadowBlur=10;ctx.fill();ctx.shadowBlur=0;
+    ctx.restore();}
+  // Narrow fuselage
+  ctx.beginPath();ctx.moveTo(0,-44);ctx.lineTo(12,-6);ctx.lineTo(8,30);ctx.lineTo(-8,30);ctx.lineTo(-12,-6);ctx.closePath();
+  const fg=ctx.createLinearGradient(0,-44,0,30);fg.addColorStop(0,'#fff');fg.addColorStop(0.25,b.col);fg.addColorStop(1,'#021410');
+  ctx.fillStyle=fg;ctx.fill();ctx.strokeStyle=b.col;ctx.lineWidth=2;ctx.stroke();
+  ctx.restore();
+}
+function drawBossChaos(b,t){// S7 — eldritch mandala of eyes
+  // Distortion tendrils
+  ctx.save();ctx.strokeStyle=b.col+'66';ctx.lineWidth=1.4;
+  for(let i=0;i<6;i++){const a=b.rot*2+(Math.PI*2/6)*i;
+    ctx.beginPath();ctx.moveTo(Math.cos(a)*20,Math.sin(a)*20);
+    ctx.quadraticCurveTo(Math.cos(a+0.6)*60,Math.sin(a+0.6)*60,
+      Math.cos(a+Math.sin(t*4+i))*86,Math.sin(a+Math.sin(t*4+i))*86);
+    ctx.stroke();}
+  ctx.restore();
+  // Triple counter-rotating eye rings
+  for(let ring=0;ring<3;ring++){
+    const rr=34+ring*18,n=6+ring*3,dir=ring%2?-1:1;
+    ctx.save();ctx.rotate(b.rot*(1.2+ring*0.7)*dir);
+    ctx.beginPath();ctx.arc(0,0,rr,0,Math.PI*2);
+    ctx.strokeStyle=b.col+(ring===2?'55':'88');ctx.lineWidth=2-ring*0.4;ctx.stroke();
+    for(let i=0;i<n;i++){const a=(Math.PI*2/n)*i;
+      ctx.save();ctx.translate(Math.cos(a)*rr,Math.sin(a)*rr);
+      ctx.beginPath();ctx.ellipse(0,0,5,3.2,a,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();
+      ctx.beginPath();ctx.arc(0,0,1.8,0,Math.PI*2);ctx.fillStyle=b.col;ctx.fill();
+      ctx.restore();}
+    ctx.restore();}
+}
+
 function drawBoss(){
   if(!boss)return;
   const b=boss,t=Date.now()/500,pulse=0.85+Math.sin(t*4)*0.15;
@@ -935,23 +1096,16 @@ function drawBoss(){
       ctx.closePath();ctx.strokeStyle=b.col;ctx.lineWidth=1;ctx.globalAlpha=0.3;ctx.stroke();ctx.globalAlpha=1;ctx.restore();}
     ctx.restore();
   }
-  // Star body
-  ctx.save();ctx.rotate(b.rot);
-  const spikes=b.phase>=2?14:10;
-  ctx.beginPath();
-  for(let i=0;i<spikes;i++){const a=(Math.PI*2/spikes)*i,r=i%2===0?57+Math.sin(t*5)*3:34;
-    i===0?ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r):ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);}
-  ctx.closePath();
-  const sbg=ctx.createRadialGradient(0,0,10,0,0,60);sbg.addColorStop(0,'#110010');sbg.addColorStop(0.5,'#06010e');sbg.addColorStop(1,b.col+'11');
-  ctx.fillStyle=sbg;ctx.fill();ctx.strokeStyle=b.col;ctx.lineWidth=2.5;ctx.stroke();
-  for(let i=0;i<spikes;i+=2){const a=(Math.PI*2/spikes)*i;
-    ctx.beginPath();ctx.arc(Math.cos(a)*57,Math.sin(a)*57,3,0,Math.PI*2);ctx.fillStyle=b.col;ctx.shadowBlur=10;ctx.fill();ctx.shadowBlur=0;}
-  ctx.restore();
-  // Inner gear
-  ctx.save();ctx.rotate(-b.rot*2);ctx.beginPath();
-  for(let i=0;i<8;i++){const a=(Math.PI*2/8)*i,r=i%2===0?32:24;
-    i===0?ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r):ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);}
-  ctx.closePath();ctx.strokeStyle=b.col+'77';ctx.lineWidth=2;ctx.stroke();ctx.restore();
+  // Unique body per boss
+  switch(b.kind){
+    case 1:drawBossGhost(b,t);break;
+    case 2:drawBossWhale(b,t);break;
+    case 3:drawBossQuantum(b,t);break;
+    case 4:drawBossBlaze(b,t);break;
+    case 6:drawBossHunter(b,t);break;
+    case 7:drawBossChaos(b,t);break;
+    default:drawBossVoid(b,t);
+  }
   // Core glow
   const ig=ctx.createRadialGradient(0,0,0,0,0,22);ig.addColorStop(0,'#fff');ig.addColorStop(0.2,b.col);ig.addColorStop(0.6,b.col+'88');ig.addColorStop(1,'transparent');
   ctx.fillStyle=ig;ctx.shadowBlur=28*pulse;ctx.beginPath();ctx.arc(0,0,22,0,Math.PI*2);ctx.fill();
@@ -1286,34 +1440,76 @@ function dropGem(x,y,wtype){powerups.push({x,y,vy:1.4,wtype,life:380});}
 
 function spawnBoss(){
   const c=cfg();
-  boss={x:W/2,y:100,hp:c.bHp,maxHp:c.bHp,col:c.color,name:c.bossName,phase:1,rot:0,mt:0,st:0,
-    srate:Math.max(18,65-stage*6-(loop-1)*5),pat:0};
+  boss={x:W/2,y:100,hp:c.bHp,maxHp:c.bHp,col:c.color,name:c.bossName,kind:Math.min(stage,7),phase:1,rot:0,mt:0,st:0,
+    srate:Math.max(18,65-stage*6-(loop-1)*5),pat:0,tpT:0};
   enemies=[];eBullets=[];
   sfxBossAppear();
   startBGM(true); // boss mode — faster BGM
 }
 
 function fireBoss(){
-  if(!boss)return;const spd=3+stage*0.55+(loop-1)*0.3;
-  const p=boss.pat%(boss.phase===1?4:8);
-  switch(p){
-    case 0:{const base=Math.atan2(P.y-boss.y,P.x-boss.x),n=3+stage;for(let i=0;i<n;i++){const a=base+(i-(n-1)/2)*0.22;eBullets.push({x:boss.x,y:boss.y,vx:Math.cos(a)*spd,vy:Math.sin(a)*spd,col:boss.col});}break;}
-    case 1:{for(let i=0;i<8;i++){const a=(Math.PI*2/8)*i;eBullets.push({x:boss.x,y:boss.y,vx:Math.cos(a)*spd,vy:Math.sin(a)*spd,col:boss.col});}break;}
-    case 2:{for(let i=0;i<6;i++){const a=(Math.PI*2/6)*i+boss.rot*4;eBullets.push({x:boss.x,y:boss.y,vx:Math.cos(a)*spd,vy:Math.sin(a)*spd,col:boss.col});}break;}
-    case 3:{const base=Math.atan2(P.y-boss.y,P.x-boss.x);for(let i=-1;i<=1;i++)eBullets.push({x:boss.x,y:boss.y,vx:Math.cos(base+i*0.28)*(spd+0.5),vy:Math.sin(base+i*0.28)*(spd+0.5),col:boss.col});break;}
-    case 4:{for(let i=0;i<12;i++){const a=(Math.PI*2/12)*i;eBullets.push({x:boss.x,y:boss.y,vx:Math.cos(a)*(spd*1.3),vy:Math.sin(a)*(spd*1.3),col:boss.col});}break;}
-    case 5:{for(let i=0;i<18;i++){const a=(Math.PI*2/18)*i+boss.rot;eBullets.push({x:boss.x,y:boss.y,vx:Math.cos(a)*(spd+rand(-0.5,0.5)),vy:Math.sin(a)*(spd+rand(-0.5,0.5)),col:boss.col});}break;}
-    case 6:{// Double offset spiral
-      for(let i=0;i<8;i++){const a=(Math.PI*2/8)*i+(boss.pat%20)*0.18;
-        eBullets.push({x:boss.x,y:boss.y,vx:Math.cos(a)*spd,vy:Math.sin(a)*spd,col:boss.col});
-        eBullets.push({x:boss.x,y:boss.y,vx:Math.cos(a+Math.PI/8)*spd*0.72,vy:Math.sin(a+Math.PI/8)*spd*0.72,col:boss.col+'cc'});}
+  if(!boss)return;const b=boss,spd=3+stage*0.55+(loop-1)*0.3;
+  const aim=Math.atan2(P.y-b.y,P.x-b.x);
+  const F=(a,s,o)=>{o=o||{};eBullets.push({x:b.x,y:b.y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,col:o.col||b.col,hm:o.hm,big:o.big});};
+  switch(b.kind){
+    case 1:{// 幽靈掠奪者 — aimed fans & downward sprays, simple & readable
+      const p=b.pat%(b.phase===1?2:3);
+      if(p===0){const n=b.phase>=2?5:3;for(let i=0;i<n;i++)F(aim+(i-(n-1)/2)*0.22,spd);}
+      else if(p===1){for(let i=0;i<5;i++)F(Math.PI/2+(i-2)*0.3,spd*0.9);}
+      else{for(let i=0;i<8;i++)F((Math.PI*2/8)*i,spd*0.85);}
       break;}
-    case 7:{// Homing cluster
-      for(let i=0;i<6;i++){const a=(Math.PI*2/6)*i;
-        eBullets.push({x:boss.x,y:boss.y,vx:Math.cos(a)*spd*0.65,vy:Math.sin(a)*spd*0.65,col:boss.col,hm:true});}
+    case 2:{// 電磁鯨魚 — lightning columns & sonar rings
+      const p=b.pat%(b.phase===1?3:4);
+      if(p===0){for(let i=0;i<(b.phase>=2?4:3);i++){const lx=rand(30,W-30);
+        for(let j=0;j<3;j++)eBullets.push({x:lx,y:b.y-j*16,vx:0,vy:spd*1.25+j*0.3,col:'#aaffdd'});}}
+      else if(p===1){for(let i=0;i<10;i++)F((Math.PI*2/10)*i,spd*0.8);}
+      else if(p===2){for(let i=-2;i<=2;i++)F(aim+i*0.16,spd);}
+      else{for(let i=0;i<12;i++)F((Math.PI*2/12)*i+b.rot*2,spd*0.95);}
+      break;}
+    case 3:{// 量子破壞者 — spiral arms, mirror shots, dual-speed rings
+      const p=b.pat%(b.phase===1?3:4);
+      if(p===0){for(let i=0;i<4;i++)F(b.rot*6+(Math.PI/2)*i,spd);}
+      else if(p===1){for(let i=0;i<6;i++)F((Math.PI*2/6)*i+b.pat*0.25,spd*0.9);}
+      else if(p===2){F(aim,spd*1.4);F(aim+0.5,spd*1.1,{col:b.col+'cc'});F(aim-0.5,spd*1.1,{col:b.col+'cc'});}
+      else{for(let i=0;i<14;i++)F((Math.PI*2/14)*i,spd*(0.7+(i%2)*0.5));}
+      break;}
+    case 4:{// 熾焰邪王 — flame curtains & meteor rain
+      const p=b.pat%(b.phase===1?3:4);
+      if(p===0){for(let i=0;i<7;i++)F(Math.PI/2+(i-3)*0.22,spd*0.85,{big:i===3});}
+      else if(p===1){for(let i=0;i<3;i++)F(aim+rand(-0.1,0.1),spd*1.3);}
+      else if(p===2){for(let i=0;i<5;i++)eBullets.push({x:rand(30,W-30),y:-10,vx:rand(-0.5,0.5),vy:spd*0.9,col:'#ffaa33',big:Math.random()<0.3});}
+      else{for(let i=0;i<16;i++)F((Math.PI*2/16)*i+b.rot*3,spd);}
+      break;}
+    case 5:{// 虛空主宰 — chaotic mixed barrage with homing
+      const p=b.pat%(b.phase===1?4:6);
+      if(p===0){const n=b.phase>=2?6:4;for(let i=0;i<n;i++)F(aim+(i-(n-1)/2)*0.2,spd);}
+      else if(p===1){for(let i=0;i<10;i++)F((Math.PI*2/10)*i,spd);}
+      else if(p===2){for(let i=0;i<8;i++){F((Math.PI*2/8)*i+b.pat*0.18,spd);F((Math.PI*2/8)*i+Math.PI/8+b.pat*0.18,spd*0.72,{col:b.col+'cc'});}}
+      else if(p===3){for(let i=0;i<3;i++)F((Math.PI*2/3)*i+b.rot*2,spd*0.6,{hm:true});}
+      else if(p===4){for(let i=0;i<18;i++)F((Math.PI*2/18)*i+b.rot,spd+rand(-0.5,0.5));}
+      else{for(let i=-2;i<=2;i++)F(aim+i*0.14,spd*1.25);}
+      break;}
+    case 6:{// 銀河獵手 — sniper shots, twin homing missiles, crossfire
+      const p=b.pat%(b.phase===1?3:5);
+      if(p===0){F(aim,spd*1.8,{big:true});}
+      else if(p===1){F(aim-0.5,spd*0.7,{hm:true});F(aim+0.5,spd*0.7,{hm:true});}
+      else if(p===2){for(let i=0;i<4;i++)F(Math.PI/4+(Math.PI/2)*i+b.rot*3,spd);}
+      else if(p===3){for(let i=0;i<3;i++)F(aim+rand(-0.06,0.06),spd*1.6);}
+      else{for(let i=0;i<12;i++)F((Math.PI*2/12)*i,spd*0.95);}
+      break;}
+    case 7:{// 混沌神降 — everything at once, dense bullet hell
+      const p=b.pat%(b.phase===1?5:8);
+      if(p===0){for(let i=0;i<5;i++)F(b.rot*8+(Math.PI*2/5)*i,spd);}
+      else if(p===1){for(let i=0;i<6;i++)F(aim+(i-2.5)*0.17,spd*1.1);}
+      else if(p===2){for(let i=0;i<16;i++)F((Math.PI*2/16)*i+b.pat*0.12,spd*(0.75+(i%2)*0.45));}
+      else if(p===3){for(let i=0;i<4;i++)F((Math.PI/2)*i+b.rot*2,spd*0.62,{hm:true});}
+      else if(p===4){for(let i=0;i<6;i++)eBullets.push({x:rand(20,W-20),y:-10,vx:rand(-1,1),vy:spd*0.95,col:b.col,big:Math.random()<0.25});}
+      else if(p===5){for(let i=0;i<20;i++)F((Math.PI*2/20)*i+b.rot,spd+rand(-0.6,0.6));}
+      else if(p===6){F(aim,spd*1.9,{big:true});F(aim+0.35,spd*1.4);F(aim-0.35,spd*1.4);}
+      else{for(let i=0;i<10;i++){F((Math.PI*2/10)*i+b.pat*0.2,spd);F((Math.PI*2/10)*i-b.pat*0.2,spd*0.7,{col:b.col+'bb'});}}
       break;}
   }
-  boss.pat++;
+  b.pat++;
 }
 
 // ═══════════════════════════════════════════════════
@@ -1429,9 +1625,26 @@ function updateEnemies(){
 }
 
 function updateBoss(){
-  if(!boss)return;boss.rot+=0.022;boss.mt++;
-  const t=boss.mt*0.012;
-  boss.x+=(W/2+Math.sin(t)*(W*0.34)-boss.x)*0.028;boss.y+=(80+Math.sin(t*0.6)*70-boss.y)*0.028;
+  if(!boss)return;const b=boss;b.rot+=0.022;b.mt++;
+  const t=b.mt*0.012;
+  switch(b.kind){
+    case 2:// whale — slow heavy drift with bobbing
+      b.x+=(W/2+Math.sin(t*0.5)*(W*0.3)-b.x)*0.015;b.y+=(110+Math.sin(t*1.6)*34-b.y)*0.03;break;
+    case 3:// quantum — teleports across the arena
+      b.tpT++;
+      if(b.tpT>150){b.tpT=0;ringBurst(b.x,b.y,b.col,14,6);
+        b.x=rand(70,W-70);b.y=rand(60,200);ringBurst(b.x,b.y,'#fff',10,5);}
+      b.x+=Math.sin(t*5)*0.8;break;
+    case 4:// blaze — aggressively chases player's x
+      b.x+=(P.x-b.x)*0.022;b.y+=(95+Math.sin(t*1.2)*55-b.y)*0.03;break;
+    case 6:// hunter — fast pursuit dashes
+      b.x+=(P.x-b.x)*0.05;b.y+=(70+Math.cos(t*2.4)*45-b.y)*0.04;break;
+    case 7:// chaos — erratic lissajous weaving
+      b.x+=(W/2+Math.sin(t*1.7)*(W*0.38)+Math.sin(t*4.3)*30-b.x)*0.04;b.y+=(95+Math.sin(t*2.9)*70-b.y)*0.04;break;
+    default:// ghost(1) & void(5) — wide smooth sweep
+      b.x+=(W/2+Math.sin(t)*(W*0.34)-b.x)*0.028;b.y+=(80+Math.sin(t*0.6)*70-b.y)*0.028;
+  }
+  b.x=Math.max(60,Math.min(W-60,b.x));
   if(boss.hp<boss.maxHp*0.5&&boss.phase===1){
     boss.phase=2;boss.srate=Math.max(12,boss.srate-12);
     ringBurst(boss.x,boss.y,boss.col,24,6);spark(boss.x,boss.y,boss.col,22);
