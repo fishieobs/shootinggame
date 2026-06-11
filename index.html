@@ -635,6 +635,9 @@ function weaponColor(){
   if(WEAPON.type==='wave')    return'#00ffaa';
   return cfg().color;
 }
+// Strip alpha from '#rrggbbaa' so another alpha suffix can be appended
+// (10-digit hex throws SyntaxError in canvas addColorStop → freezes the game)
+function baseCol(c){return c.length>7?c.slice(0,7):c;}
 
 // ═══════════════════════════════════════════════════
 //  DRAW FUNCTIONS
@@ -1139,12 +1142,12 @@ function drawBullet(b,enemy){
       ctx.shadowBlur=16;ctx.fillStyle=b.col;
       ctx.beginPath();ctx.moveTo(9,0);ctx.lineTo(0,4);ctx.lineTo(-5,0);ctx.lineTo(0,-4);ctx.closePath();ctx.fill();
       ctx.strokeStyle='#fff';ctx.lineWidth=0.7;ctx.globalAlpha=0.5;ctx.stroke();ctx.globalAlpha=1;
-      const tg=ctx.createLinearGradient(-5,0,-22,0);tg.addColorStop(0,b.col+'bb');tg.addColorStop(1,'transparent');
+      const tg=ctx.createLinearGradient(-5,0,-22,0);tg.addColorStop(0,baseCol(b.col)+'bb');tg.addColorStop(1,'transparent');
       ctx.fillStyle=tg;ctx.beginPath();ctx.ellipse(-12,0,9,2.5,0,0,Math.PI*2);ctx.fill();
     } else {
       const r=b.big?9:5.5;
       const eg=ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,r);
-      eg.addColorStop(0,'#fff');eg.addColorStop(0.45,b.col);eg.addColorStop(1,b.col+'22');
+      eg.addColorStop(0,'#fff');eg.addColorStop(0.45,b.col);eg.addColorStop(1,baseCol(b.col)+'22');
       ctx.fillStyle=eg;ctx.beginPath();ctx.arc(b.x,b.y,r,0,Math.PI*2);ctx.fill();
     }
   } else if(b.missile){
@@ -1152,7 +1155,7 @@ function drawBullet(b,enemy){
     ctx.translate(b.x,b.y);ctx.rotate(ang);
     // Exhaust flame
     const fg=ctx.createRadialGradient(0,14,0,0,14,10);
-    fg.addColorStop(0,'#ffee00cc');fg.addColorStop(0.5,b.col+'88');fg.addColorStop(1,'transparent');
+    fg.addColorStop(0,'#ffee00cc');fg.addColorStop(0.5,baseCol(b.col)+'88');fg.addColorStop(1,'transparent');
     ctx.fillStyle=fg;ctx.beginPath();ctx.ellipse(0,14,5,9,0,0,Math.PI*2);ctx.fill();
     // Body
     const mg=ctx.createLinearGradient(0,8,0,-18);mg.addColorStop(0,b.col);mg.addColorStop(0.6,'#ffcc66');mg.addColorStop(1,'#ffffff');
@@ -1169,14 +1172,14 @@ function drawBullet(b,enemy){
     const r=4+Math.sin(b.wt*0.3)*1.5;
     // Outer glow
     const wg=ctx.createRadialGradient(0,0,0,0,0,r+6);
-    wg.addColorStop(0,'#ffffff');wg.addColorStop(0.35,b.col);wg.addColorStop(0.7,b.col+'66');wg.addColorStop(1,'transparent');
+    wg.addColorStop(0,'#ffffff');wg.addColorStop(0.35,b.col);wg.addColorStop(0.7,baseCol(b.col)+'66');wg.addColorStop(1,'transparent');
     ctx.fillStyle=wg;ctx.shadowBlur=14;ctx.beginPath();ctx.arc(0,0,r+6,0,Math.PI*2);ctx.fill();
     // Bright core
     ctx.fillStyle='#fff';ctx.shadowBlur=8;ctx.beginPath();ctx.arc(0,0,r*0.45,0,Math.PI*2);ctx.fill();
   } else {
     const ang=Math.atan2(b.vy,b.vx)+Math.PI/2;
     ctx.translate(b.x,b.y);ctx.rotate(ang);
-    const pg=ctx.createLinearGradient(0,6,0,-20);pg.addColorStop(0,'transparent');pg.addColorStop(0.3,b.col+'99');pg.addColorStop(1,'#ffffff');
+    const pg=ctx.createLinearGradient(0,6,0,-20);pg.addColorStop(0,'transparent');pg.addColorStop(0.3,baseCol(b.col)+'99');pg.addColorStop(1,'#ffffff');
     ctx.fillStyle=pg;ctx.beginPath();ctx.ellipse(0,-5,3,13,0,0,Math.PI*2);ctx.fill();
     ctx.fillStyle='#fff';ctx.shadowBlur=12;ctx.beginPath();ctx.arc(0,-15,3.2,0,Math.PI*2);ctx.fill();
   }
